@@ -121,7 +121,7 @@ function toast(msg){
 }
 
 async function gh(path, opts={}){
-  const res = await fetch(`https://api.github.com/repos/${repo()}/${path}`, {
+  const res = await fetch(`https://api.github.com/repos/${repo()}${path ? "/" + path : ""}`, {
     cache:"no-store", ...opts,
     headers:{"Authorization":`Bearer ${token()}`,"Accept":opts.raw?"application/vnd.github.raw+json":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28",...(opts.headers||{})}
   });
@@ -156,7 +156,7 @@ function settingsView(msg){
   <div style="margin-top:22px"><button class="primary" id="savekey">Save and check</button></div>
   <p class="err" id="err">${esc(msg||"")}</p>`;
   document.getElementById("savekey").onclick = async ()=>{
-    const t=document.getElementById("tok").value.trim(), r=document.getElementById("rep").value.trim();
+    const t=document.getElementById("tok").value.replace(/[^\x21-\x7E]/g,""), r=document.getElementById("rep").value.trim();
     if(!t){ document.getElementById("err").textContent="Paste the access key first."; return; }
     store("weave.token",t); store("weave.repo",r||DEFAULT_REPO);
     try{ const info = await gh(""); if(!info) throw new Error("That repository was not found, or the key cannot see it."); toast("Connected"); const pend=store("weave.pendingshare"); if(pend){ store("weave.pendingshare",null); history.replaceState(null,"",location.pathname); return addView(pend);} history.replaceState(null,"",location.pathname); go("#"); }
