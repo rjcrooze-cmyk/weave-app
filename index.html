@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1D2531">
+<title>Weave</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9EDF2; --surface:#F7F9FB; --ink:#1D2531; --muted:#5B6676; --line:#CFD6DF;
+  --thread:#2F5D8A; --thread-soft:#DCE6F0;
+  --established:#2E7D5B; --emerging:#B7791F; --disputed:#B4343F; --opinion:#6A4C9C; --experience:#23798E;
+  --sans:"Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#141A22; --surface:#1C2430; --ink:#E6EAF0; --muted:#9AA6B6; --line:#2E3949;
+    --thread:#7FA8D1; --thread-soft:#233246;
+    --established:#5DBB8F; --emerging:#E0A84A; --disputed:#E06C76; --opinion:#A98BD9; --experience:#5BB6C8;}
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--thread);outline-offset:2px}
+.wrap{max-width:640px;margin:0 auto;padding:16px}
+header.top{display:flex;align-items:center;justify-content:space-between;padding:8px 0 16px}
+.brand{font-family:var(--serif);font-size:1.6rem;font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.brand svg{width:28px;height:28px}
+.iconbtn{background:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;color:var(--muted)}
+.primary{background:var(--thread);color:#fff;border:0;border-radius:12px;padding:14px 18px;font-weight:600;width:100%;cursor:pointer}
+@media (prefers-color-scheme: dark){.primary{color:#0F1620}}
+.primary[disabled]{opacity:.5}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;cursor:pointer;font-size:.92rem;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+label.f{display:block;font-weight:600;margin:18px 0 6px}
+.hint{color:var(--muted);font-size:.9rem;margin:4px 0 0}
+input.t,textarea.t{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px}
+textarea.t{min-height:80px;resize:vertical}
+.list{display:flex;flex-direction:column;gap:2px;margin-top:16px}
+.row{background:var(--surface);padding:14px 16px;cursor:pointer;border:0;text-align:left;width:100%;display:block}
+.row:first-child{border-radius:14px 14px 4px 4px}.row:last-child{border-radius:4px 4px 14px 14px}.row:only-child{border-radius:14px}
+.row h3{margin:0 0 4px;font-size:1rem;font-weight:600}
+.row p{margin:0;color:var(--muted);font-size:.92rem}
+.meta{display:flex;flex-wrap:wrap;gap:10px;color:var(--muted);font-size:.85rem;margin-top:6px;align-items:center}
+.pending{border-left:3px solid var(--thread)}
+.failed{border-left:3px solid var(--disputed)}
+.sectionhead{font-weight:600;color:var(--muted);font-size:.9rem;margin:24px 0 0}
+.empty{background:var(--surface);border-radius:14px;padding:22px;margin-top:16px}
+.empty h2{font-family:var(--serif);margin:0 0 6px;font-size:1.25rem}
+.dots{display:inline-flex;gap:3px;vertical-align:middle}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--line);display:block}
+.dots i.on{background:var(--ink)}
+.card h1{font-family:var(--serif);font-size:1.55rem;line-height:1.2;margin:4px 0 6px;font-weight:600}
+.saved{display:flex;gap:16px;align-items:baseline;margin:10px 0 2px;flex-wrap:wrap}
+.saved b{font-family:var(--serif);font-size:1.9rem;font-weight:600}
+.block{background:var(--surface);border-radius:14px;padding:16px;margin-top:14px}
+.block h2{margin:0 0 8px;font-size:.95rem;color:var(--muted);font-weight:600}
+.eli5{font-family:var(--serif);font-size:1.12rem;line-height:1.55;margin:0}
+.map{display:flex;flex-direction:column;gap:8px}
+.mapitem{display:flex;gap:10px;align-items:flex-start}
+.badge{flex:none;font-size:.78rem;font-weight:600;border-radius:6px;padding:2px 7px;background:var(--thread-soft);color:var(--thread)}
+.badge.contradicts{background:var(--disputed);color:#fff}
+.alert{border:2px solid var(--disputed)}
+.thread{display:flex;gap:4px;margin:8px 0 2px}
+.thread span{flex:1;height:10px;border-radius:5px;background:var(--line)}
+.thread span.d1{background:var(--thread-soft)} .thread span.d2{background:var(--thread)} .thread span.d3{background:var(--ink)}
+.sec{margin-top:22px}
+.sec h3{display:flex;justify-content:space-between;gap:10px;margin:0 0 6px;font-size:1rem}
+.sec h3 small{color:var(--muted);font-weight:400;white-space:nowrap}
+.pt{display:grid;grid-template-columns:30px 1fr;gap:4px 10px;padding:12px 0;border-top:1px solid var(--line)}
+.pt .imp{padding-top:4px}
+.pt p{margin:0}
+.pt .tags{display:flex;gap:10px;flex-wrap:wrap;font-size:.85rem;margin-top:4px;align-items:center}
+.ev{display:inline-flex;align-items:center;gap:5px}
+.ev::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}
+.ev.established{color:var(--established)}.ev.emerging{color:var(--emerging)}.ev.disputed{color:var(--disputed)}.ev.opinion{color:var(--opinion)}.ev.experience{color:var(--experience)}
+.ts{color:var(--thread);text-decoration:none;font-weight:600}
+.useit{grid-column:2;background:var(--thread-soft);border-radius:8px;padding:8px 10px;font-size:.93rem;margin-top:6px}
+.skip{color:var(--muted);font-style:italic;margin:4px 0 0}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.82rem;margin-top:8px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:12px;max-width:90%;z-index:10}
+.err{color:var(--disputed);margin-top:10px}
+a{color:var(--thread)}
+@media (prefers-reduced-motion: no-preference){.toast{animation:rise .25s ease-out}@keyframes rise{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const CATS = [
+  ["mind","Mind, Consciousness and Reality"],
+  ["science","AI and Science"],
+  ["money","Business and Money"],
+  ["life","Life and Joy"],
+  ["adhd","ADHD and Mental Health"]
+];
+const CATNAME = Object.fromEntries(CATS);
+const EVNAME = {established:"Established",emerging:"Emerging",disputed:"Disputed",opinion:"Speaker's opinion",experience:"Experience report"};
+const DEFAULT_REPO = "rjcrooze-cmyk/weave-vault";
+const app = document.getElementById("app");
+const state = {filter:"all", cards:[], pending:[], failed:[], loading:false, poll:null};
+
+function store(k,v){try{ if(v===undefined) return localStorage.getItem(k); if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v);}catch(e){return null}}
+const token = () => store("weave.token");
+const repo = () => store("weave.repo") || DEFAULT_REPO;
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function toast(msg){
+  document.querySelectorAll(".toast").forEach(t=>t.remove());
+  const t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),4500);
+}
+
+async function gh(path, opts={}){
+  const res = await fetch(`https://api.github.com/repos/${repo()}/${path}`, {
+    cache:"no-store", ...opts,
+    headers:{"Authorization":`Bearer ${token()}`,"Accept":opts.raw?"application/vnd.github.raw+json":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28",...(opts.headers||{})}
+  });
+  if(res.status===404) return null;
+  if(res.status===401) throw new Error("The access key was rejected. Check it in Settings.");
+  if(!res.ok) throw new Error(`GitHub said ${res.status}. Try again in a moment.`);
+  return opts.raw ? res.text() : res.json();
+}
+const ghJSON = async p => { const t = await gh(`contents/${p}`, {raw:true}); return t ? JSON.parse(t) : null; };
+function b64(str){ const bytes=new TextEncoder().encode(str); let bin=""; bytes.forEach(b=>bin+=String.fromCharCode(b)); return btoa(bin); }
+
+function findUrl(text){
+  const m = String(text||"").match(/https?:\/\/[^\s]+/); return m ? m[0] : "";
+}
+function isYouTube(u){ return /(youtube\.com|youtu\.be)\//i.test(u); }
+
+const logo = `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 10c6 0 6 12 13 12s7-12 13-12" fill="none" stroke="var(--thread)" stroke-width="3" stroke-linecap="round"/><path d="M3 22c6 0 6-12 13-12s7 12 13 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`;
+function header(right){ return `<header class="top"><div class="brand">${logo}<span>Weave</span></div>${right||""}</header>`; }
+function dots(n){ return `<span class="dots" aria-label="Importance ${n} of 3">${[1,2,3].map(i=>`<i class="${i<=n?"on":""}"></i>`).join("")}</span>`; }
+function attentionLabel(n){ return ["","Low","Medium","High"][n]||""; }
+function when(iso){ try{ return new Date(iso).toLocaleDateString(undefined,{day:"numeric",month:"short"}); }catch(e){return ""} }
+
+function settingsView(msg){
+  app.innerHTML = header(token()?`<button class="iconbtn" onclick="go('#')">Done</button>`:"") + `
+  <div class="empty"><h2>Connect your vault</h2>
+  <p class="hint" style="margin:0">Weave saves everything to your private GitHub repository. Paste the access key you created for it. It stays on this phone only.</p></div>
+  <label class="f" for="tok">Access key</label>
+  <input class="t" id="tok" type="password" autocomplete="off" placeholder="github_pat_..." value="${esc(token()||"")}">
+  <label class="f" for="rep">Vault repository</label>
+  <input class="t" id="rep" type="text" autocomplete="off" value="${esc(repo())}">
+  <p class="hint">Owner and name, like ${esc(DEFAULT_REPO)}</p>
+  <div style="margin-top:22px"><button class="primary" id="savekey">Save and check</button></div>
+  <p class="err" id="err">${esc(msg||"")}</p>`;
+  document.getElementById("savekey").onclick = async ()=>{
+    const t=document.getElementById("tok").value.trim(), r=document.getElementById("rep").value.trim();
+    if(!t){ document.getElementById("err").textContent="Paste the access key first."; return; }
+    store("weave.token",t); store("weave.repo",r||DEFAULT_REPO);
+    try{ const info = await gh(""); if(!info) throw new Error("That repository was not found, or the key cannot see it."); toast("Connected"); const pend=store("weave.pendingshare"); if(pend){ store("weave.pendingshare",null); history.replaceState(null,"",location.pathname); return addView(pend);} history.replaceState(null,"",location.pathname); go("#"); }
+    catch(e){ document.getElementById("err").textContent=e.message; }
+  };
+}
+
+function addView(prefill){
+  let cat = store("weave.lastcat") || "mind";
+  app.innerHTML = header(`<button class="iconbtn" onclick="go('#')">Cancel</button>`) + `
+  <label class="f" for="url">YouTube link</label>
+  <input class="t" id="url" type="url" inputmode="url" placeholder="Paste a link" value="${esc(prefill||"")}">
+  <label class="f">Category</label>
+  <div class="chips" id="cats">${CATS.map(([k,n])=>`<button class="chip" data-k="${k}" aria-pressed="${k===cat}">${esc(n)}</button>`).join("")}</div>
+  <label class="f" for="note">Note <span class="hint" style="font-weight:400">(optional)</span></label>
+  <textarea class="t" id="note" placeholder="Why this caught your eye"></textarea>
+  <div style="margin-top:22px"><button class="primary" id="save">Save to Weave</button></div>
+  <p class="err" id="err"></p>`;
+  document.querySelectorAll("#cats .chip").forEach(b=>b.onclick=()=>{ cat=b.dataset.k; document.querySelectorAll("#cats .chip").forEach(x=>x.setAttribute("aria-pressed", x===b)); });
+  document.getElementById("save").onclick = async e=>{
+    const url=document.getElementById("url").value.trim(), note=document.getElementById("note").value.trim();
+    const err=document.getElementById("err");
+    if(!isYouTube(url)){ err.textContent="That doesn't look like a YouTube link. Articles and PDFs come in a later version."; return; }
+    e.target.disabled=true; e.target.textContent="Saving";
+    const stamp=new Date().toISOString(); const name=stamp.replace(/[:.]/g,"-")+".json";
+    const item={url, category:cat, note, added_at:stamp};
+    try{
+      await gh(`contents/inbox/${name}`,{method:"PUT",body:JSON.stringify({message:`Add ${cat} item`,content:b64(JSON.stringify(item,null,2))})});
+      store("weave.lastcat",cat);
+      toast("Saved. Your card will be ready in a few minutes.");
+      history.replaceState(null,"",location.pathname); go("#");
+    }catch(x){ err.textContent=x.message; e.target.disabled=false; e.target.textContent="Save to Weave"; }
+  };
+}
+
+async function load(){
+  state.loading=true;
+  const [index, inbox, failed] = await Promise.all([
+    ghJSON("cards/index.json").catch(()=>null),
+    gh("contents/inbox").catch(()=>null),
+    gh("contents/failed").catch(()=>null)
+  ]);
+  state.cards = index || [];
+  state.pending = (inbox||[]).filter(f=>f.name.endsWith(".json"));
+  state.failed = (failed||[]).filter(f=>f.name.endsWith(".json"));
+  state.loading=false;
+}
+
+async function homeView(){
+  if(!token()) return settingsView();
+  app.innerHTML = header(`<button class="iconbtn" onclick="go('#settings')">Settings</button>`) + `<p class="hint">Loading your cards</p>`;
+  try{ await load(); }catch(e){ return settingsView(e.message); }
+  const cards = state.filter==="all" ? state.cards : state.cards.filter(c=>c.category===state.filter);
+  let html = header(`<button class="iconbtn" onclick="go('#settings')">Settings</button>`) + `
+  <button class="primary" onclick="go('#add')">Add a video</button>
+  <div class="chips" style="margin-top:16px">
+    <button class="chip" aria-pressed="${state.filter==="all"}" onclick="setFilter('all')">All</button>
+    ${CATS.map(([k,n])=>`<button class="chip" aria-pressed="${state.filter===k}" onclick="setFilter('${k}')">${esc(n)}</button>`).join("")}
+  </div>`;
+  if(state.pending.length){
+    html += `<p class="sectionhead">Being processed</p><div class="list">${state.pending.map(()=>`<div class="row pending"><h3>Reading the video</h3><p>Usually a few minutes. This page checks again on its own.</p></div>`).join("")}</div>`;
+  }
+  if(state.failed.length){
+    const items = await Promise.all(state.failed.map(f=>ghJSON(`failed/${f.name}`).catch(()=>null)));
+    html += `<p class="sectionhead">Could not process</p><div class="list">${items.filter(Boolean).map(it=>`<div class="row failed"><h3>${esc(it.url)}</h3><p>${esc(it.error||"Unknown problem")}</p></div>`).join("")}</div>`;
+  }
+  if(!cards.length && !state.pending.length){
+    html += `<div class="empty"><h2>Nothing here yet</h2><p class="hint" style="margin:0">Tap Share on any YouTube video, choose Weave, and pick a category. Or tap Add a video and paste a link.</p></div>`;
+  } else if(cards.length){
+    html += `<p class="sectionhead">${cards.length} card${cards.length>1?"s":""}</p><div class="list">${cards.map(c=>`
+      <button class="row" onclick="go('#card/${esc(c.id)}')">
+        <h3>${esc(c.title)}</h3><p>${esc(c.about||"")}</p>
+        <div class="meta"><span>${esc(CATNAME[c.category]||c.category)}</span><span>${c.minutes} min</span><span>Worth it ${dots(c.attention||1)}</span>${c.map&&c.map.some(m=>m.effect==="contradicts")?`<span style="color:var(--disputed);font-weight:600">Contradicts the map</span>`:""}<span>${when(c.added_at)}</span></div>
+      </button>`).join("")}</div>`;
+  }
+  app.innerHTML = html;
+  clearTimeout(state.poll);
+  if(state.pending.length && location.hash==="" ) state.poll=setTimeout(homeView, 30000);
+}
+function setFilter(k){ state.filter=k; homeView(); }
+
+async function cardView(id){
+  app.innerHTML = header(`<button class="iconbtn" onclick="go('#')">Back</button>`) + `<p class="hint">Opening card</p>`;
+  let c;
+  try{ c = await ghJSON(`cards/${id}.json`); }catch(e){ app.innerHTML += `<p class="err">${esc(e.message)}</p>`; return; }
+  if(!c){ app.innerHTML += `<p class="err">That card was not found.</p>`; return; }
+  const yt = t => `https://www.youtube.com/watch?v=${c.video_id}&t=${Math.floor(t)}s`;
+  const contra = (c.map||[]).filter(m=>m.effect==="contradicts");
+  const others = (c.map||[]).filter(m=>m.effect!=="contradicts");
+  const verb = {strengthens:"Strengthens",adds:"Adds to",contradicts:"Contradicts"};
+  const mapItems = arr => arr.map(m=>`<div class="mapitem"><span class="badge ${m.effect}">${verb[m.effect]} ${esc(m.q)}</span><span>${esc(m.note||"")}</span></div>`).join("");
+  const density = s => s.points.length===0?"":(s.points.length<3?"d1":(s.points.length<6?"d2":"d3"));
+  let html = header(`<button class="iconbtn" onclick="go('#')">Back</button>`) + `<article class="card">
+    <p class="hint" style="margin:0">${esc(c.category_name||"")}${c.channel?`, ${esc(c.channel)}`:""}</p>
+    <h1>${esc(c.title)}</h1>
+    <div class="saved"><span><b>${c.minutes}</b> min saved</span><span>Worth your attention ${dots(c.attention)} ${attentionLabel(c.attention)}</span></div>
+    ${c.transcript_source==="ai"?`<p class="hint">No captions were available, so the transcript was written by AI and may not be word for word.</p>`:""}
+    ${contra.length?`<section class="block alert"><h2>This contradicts the map</h2><div class="map">${mapItems(contra)}</div></section>`:""}
+    <section class="block"><h2>Explain like I'm 5</h2><p class="eli5">${esc(c.eli5)}</p></section>
+    <section class="block"><h2>Our map</h2>${others.length?`<div class="map">${mapItems(others)}</div>`:""}${c.nothing_new?`<p class="hint" style="margin:${others.length?"8px":"0"} 0 0">Nothing new for the map. Safe to skip.</p>`:(!others.length&&!contra.length?`<p class="hint" style="margin:0">No sub-questions set up for this category yet.</p>`:"")}</section>
+    <section class="block"><h2>Coverage</h2>
+      <div class="thread" aria-hidden="true">${c.sections.map(s=>`<span class="${density(s)}"></span>`).join("")}</div>
+      <p class="hint" style="margin:6px 0 0">${c.coverage.with_points} of ${c.coverage.sections} sections had key points.${c.rejected_points?` ${c.rejected_points} point${c.rejected_points>1?"s were":" was"} dropped because the quote could not be found in the transcript.`:""}</p>
+      <div class="legend">${Object.keys(EVNAME).map(k=>`<span class="ev ${k}">${EVNAME[k]}</span>`).join("")}</div>
+    </section>`;
+  c.sections.forEach(s=>{
+    html += `<section class="sec"><h3><span>${esc(s.label)}</span><small>${esc(s.start)} to ${esc(s.end)}</small></h3>`;
+    if(!s.points.length) html += `<p class="skip">No key points: ${esc(s.skip_reason)}</p>`;
+    s.points.forEach(p=>{
+      html += `<div class="pt"><div class="imp">${dots(p.importance)}</div><div><p>${esc(p.point)}</p>
+        <div class="tags"><span class="ev ${p.evidence}">${EVNAME[p.evidence]||p.evidence}</span><a class="ts" href="${yt(p.t)}" target="_blank" rel="noopener">Play ${esc(p.time)}</a></div></div>
+        ${p.use_it?`<div class="useit"><b>Use it:</b> ${esc(p.use_it)}</div>`:""}</div>`;
+    });
+    html += `</section>`;
+  });
+  html += `<section class="block" style="margin-top:28px"><a href="${esc(c.url)}" target="_blank" rel="noopener">Open the video</a> &nbsp; <a href="https://github.com/${esc(repo())}/blob/main/transcripts/${esc(c.video_id)}.json" target="_blank" rel="noopener">Full transcript</a></section></article>`;
+  app.innerHTML = html; window.scrollTo(0,0);
+}
+
+function go(h){ if(location.hash===h || (h==="#" && !location.hash)) route(); else location.hash=h; }
+function route(){
+  clearTimeout(state.poll);
+  const h = location.hash;
+  if(!token() && h!=="#settings") return settingsView();
+  if(h==="#settings") return settingsView();
+  if(h==="#add") return addView("");
+  if(h.startsWith("#card/")) return cardView(decodeURIComponent(h.slice(6)));
+  return homeView();
+}
+window.addEventListener("hashchange", route);
+
+// Share target: Android passes the link in "url" or inside "text".
+(function start(){
+  const q = new URLSearchParams(location.search);
+  if(q.has("share") || q.has("url") || q.has("text")){
+    const link = q.get("url") || findUrl(q.get("text")) || findUrl(q.get("title"));
+    if(!token()) { store("weave.pendingshare", link); return settingsView("Connect your vault first. Your shared link is kept."); }
+    return addView(link);
+  }
+  const pend = store("weave.pendingshare");
+  if(pend && token()){ store("weave.pendingshare", null); return addView(pend); }
+  route();
+})();
+
+if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+</script>
+</body>
+</html>
