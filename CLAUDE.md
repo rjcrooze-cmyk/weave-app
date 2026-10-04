@@ -48,6 +48,8 @@ with evidence labels and timestamps, and how the video changes his research map.
 Rohit brings batches of small improvements. Keep sessions cheap:
 - Read only the files the change needs. `index.html` is large; edit it in place, do not rewrite it.
 - Make the change, check JS syntax, commit with a clear message, and list what changed in plain words.
+- When a change is done and checked, merge it into `main` (and delete any side branch). Rohit's phone loads `main`, so
+  work left on a side branch never reaches him. This applies to weave-vault too.
 - Ask one question only when a request is genuinely ambiguous.
 
 ## Planned, not built yet
