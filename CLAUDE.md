@@ -22,6 +22,10 @@ with evidence labels and timestamps, and how the video changes his research map.
   - `process.py finalize`: checks every quote against the transcript with plain code, drops points
     whose quote is not really there, writes `cards/<id>.json` and `cards/index.json`, appends
     new claims to `ledger/<category>.jsonl`.
+  - `SYNTHESIS.md` + `process.py synth-prep|synthesize`: the weekly routine. The AI rates I, E, B, C, R
+    with cited claim ids; code computes the Leverage Score and writes `takeaways/<category>.json`,
+    `takeaways/life-top10.json` (the Life Top 10; `life.json` is the Life and Joy category) and
+    `takeaways/changes.json`. Ledger claims have stable `id`s.
   - `categories.json`: five categories, guiding questions, and the 18 sub-questions (Q1 to Q18)
     for Mind, Consciousness and Reality. `failed/` holds items that failed, with the reason.
   - Secrets: `TRANSCRIPT_API_KEY`, `ROUTINE_FIRE_URL`, `ROUTINE_TOKEN`.
@@ -43,6 +47,8 @@ with evidence labels and timestamps, and how the video changes his research map.
 - Plain, active, sentence-case copy. No em dashes in any text Rohit reads.
 - `gh(path)` builds `https://api.github.com/repos/<repo>/<path>`. Never add a trailing slash:
   a redirect on these requests shows up as "Failed to fetch".
+- Routes: `#` home (Life Top 10, category grid), `#cats`, `#cat/<key>/<top|map|sources|history>`,
+  `#card/<id>` (short card, Details and IDEAS taps), `#changes`, `#history/<key>`, `#add`, `#settings`.
 - Changes must keep working on Android Chrome as an installed app. The service worker is
   network-first; tell Rohit to fully close and reopen the app after a change.
 

@@ -38,7 +38,7 @@ header.top{display:flex;align-items:center;justify-content:space-between;padding
 .primary{background:var(--thread);color:#fff;border:0;border-radius:12px;padding:14px 18px;font-weight:600;width:100%;cursor:pointer}
 @media (prefers-color-scheme: dark){.primary{color:#0F1620}}
 .primary[disabled]{opacity:.5}
-.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:4px}
 .chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;cursor:pointer;font-size:.92rem;white-space:nowrap}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 label.f{display:block;font-weight:600;margin:18px 0 6px}
@@ -87,7 +87,7 @@ textarea.t{min-height:80px;resize:vertical}
 .useit{grid-column:2;background:var(--thread-soft);border-radius:8px;padding:8px 10px;font-size:.93rem;margin-top:6px}
 .skip{color:var(--muted);font-style:italic;margin:4px 0 0}
 .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.82rem;margin-top:8px}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:12px;max-width:90%;z-index:10}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:12px;max-width:90%;z-index:10}
 .err{color:var(--disputed);margin-top:10px}
 .doc h2{font-family:var(--serif);font-size:1.25rem;line-height:1.25;margin:30px 0 8px;font-weight:600}
 .doc h3{font-size:1rem;margin:20px 0 6px}
@@ -99,12 +99,89 @@ textarea.t{min-height:80px;resize:vertical}
 .trow p{margin:6px 0 0;font-size:.98rem}
 .trow p:first-child{margin-top:0;font-weight:600}
 .trow .k{display:block;font-family:var(--sans);font-weight:600;font-size:.8rem;color:var(--muted)}
+.wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;justify-content:space-around;align-items:center;gap:8px;
+  background:var(--surface);border-top:1px solid var(--line);padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px))}
+.bar[hidden]{display:none}
+.bar button{flex:1;max-width:140px;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.78rem;color:var(--muted);padding:4px 0;cursor:pointer}
+.bar button svg{width:22px;height:22px}
+.bar button[aria-current="page"]{color:var(--ink);font-weight:600}
+.bar .addbtn{flex:none;width:auto;flex-direction:row;gap:6px;background:var(--thread);color:#fff;border-radius:999px;padding:11px 22px;font-size:.95rem;font-weight:600}
+.bar .addbtn[aria-current="page"]{color:#fff}
+@media (prefers-color-scheme: dark){.bar .addbtn,.bar .addbtn[aria-current="page"]{color:#0F1620}}
+.h2row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.h2{font-family:var(--serif);font-size:1.3rem;font-weight:600;margin:26px 0 6px}
+.h2row .h2{margin-bottom:6px}
+.small{font-size:.88rem;white-space:nowrap}
+.sub0{margin:0 0 8px}
+.ctitle{font-family:var(--serif);font-size:1.45rem;line-height:1.2;margin:2px 0 12px;font-weight:600}
+.gq{font-family:var(--serif);font-size:1.02rem;color:var(--muted);margin:14px 0 6px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--surface);border:0;border-radius:14px;padding:12px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px;min-width:0}
+.tname{font-weight:600;font-size:.95rem;line-height:1.25}
+.ttop{font-family:var(--serif);font-size:.92rem;line-height:1.35;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+.ttop i{color:var(--muted)}
+.pbar{display:flex;gap:2px;height:6px;border-radius:3px;overflow:hidden}
+.pbar span{display:block}.pbar .a{background:var(--established)}.pbar .p{background:var(--emerging)}.pbar .c{background:var(--disputed)}.pbar .o{background:var(--line)}
+.prog{margin:0;color:var(--muted);font-size:.78rem;line-height:1.3}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--surface);border-radius:12px;padding:4px;position:sticky;top:0;z-index:2}
+.tabs button{border:0;background:none;border-radius:9px;padding:8px 2px;font-size:.88rem;cursor:pointer;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);font-weight:600}
+.tks{display:flex;flex-direction:column;gap:6px}
+.tk{background:var(--surface);border-radius:14px}
+.tkmain,.qrow{display:flex;gap:12px;width:100%;background:none;border:0;text-align:left;padding:12px 14px;cursor:pointer;align-items:flex-start}
+.rank,.qid{flex:none;font-family:var(--serif);font-weight:600;font-size:1.25rem;min-width:24px;text-align:center;line-height:1.2}
+.qid{font-family:var(--sans);font-size:.85rem;color:var(--thread);padding-top:2px;min-width:30px}
+.tkbody{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.sbar{position:relative;display:block;height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:6px}
+.sbar .rg{position:absolute;top:0;bottom:0;background:var(--thread-soft)}
+.sbar .fill{position:absolute;left:0;top:2px;bottom:2px;border-radius:3px;background:var(--thread)}
+.sline{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.sline b{color:var(--ink);font-size:.95rem}
+.sline .tie{color:var(--emerging)}
+.tktext{font-weight:600;line-height:1.35}
+.tkwhy{color:var(--muted);font-size:.9rem;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tk.open .tkwhy{-webkit-line-clamp:unset;display:block}
+.tchips{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 0}
+.tchip{font-size:.74rem;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--muted);white-space:nowrap}
+.tchip.lv{border-color:var(--thread);color:var(--thread)}
+.tchip.ph{border-color:var(--opinion);color:var(--opinion);white-space:normal}
+.tchip.lead{border-color:var(--emerging);color:var(--emerging)}
+.tchip.st-partial{border-color:var(--emerging);color:var(--emerging)}.tchip.st-contested{border-color:var(--disputed);color:var(--disputed)}.tchip.st-answered{border-color:var(--established);color:var(--established)}
+.tkmore{display:none;padding:0 14px 14px;border-top:1px solid var(--line)}
+.tk.open .tkmore{display:block}
+.kind{font-weight:600;font-size:.85rem;color:var(--muted);margin:10px 0 6px}
+.ings{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;text-align:center}
+.ings span{background:var(--bg);border-radius:8px;padding:6px 2px;font-size:.8rem;color:var(--muted)}
+.ings small{display:block;font-size:.7rem}.ings b{color:var(--ink);font-size:1rem}
+.sub{font-weight:600;font-size:.85rem;color:var(--muted);margin:14px 0 4px}
+.claim{display:grid;grid-template-columns:12px 1fr;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+.claim .ev{padding-top:6px}
+.claim p{margin:0;font-size:.93rem}.claim p.hint{font-size:.8rem;margin-top:2px}
+.drop{display:flex;align-items:center;gap:8px;color:var(--disputed);font-size:.8rem;font-weight:600;margin:4px 2px}
+.drop::before,.drop::after{content:"";flex:1;border-top:2px dashed var(--disputed)}
+.card h1 .mins{font-family:var(--sans);font-size:1rem;color:var(--muted);font-weight:400;white-space:nowrap}
+.short{display:flex;flex-direction:column;gap:14px}
+.kv{display:block}
+.kv .k{display:block;font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.kv p{margin:0;font-family:var(--serif);font-size:1.08rem;line-height:1.5}
+.kv p.tchips{font-family:var(--sans);margin-top:6px}
+.kv .left{font-weight:600}
+button.ideas{background:var(--thread-soft);border:0;border-radius:10px;padding:10px 12px;text-align:left;cursor:pointer;width:100%}
+button.ideas p{font-family:var(--sans);font-size:.98rem}
+.ideaslist .sub:first-child{margin-top:0}
+.detailsbtn{display:block;width:100%;margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;font-weight:600;cursor:pointer}
 a{color:var(--thread)}
 @media (prefers-reduced-motion: no-preference){.toast{animation:rise .25s ease-out}@keyframes rise{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}}
 </style>
 </head>
 <body>
 <div class="wrap" id="app"></div>
+<nav class="bar" id="bar" hidden>
+  <button data-tab="home" onclick="go('#')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Home</button>
+  <button data-tab="add" class="addbtn" onclick="go('#add')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>Add</button>
+  <button data-tab="cats" onclick="go('#cats')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Categories</button>
+</nav>
 <script>
 const CATS = [
   ["mind","Mind, Consciousness and Reality"],
@@ -117,7 +194,7 @@ const CATNAME = Object.fromEntries(CATS);
 const EVNAME = {established:"Established",emerging:"Emerging",disputed:"Disputed",opinion:"Speaker's opinion",experience:"Experience report"};
 const DEFAULT_REPO = "rjcrooze-cmyk/weave-vault";
 const app = document.getElementById("app");
-const state = {filter:"all", cards:[], pending:[], failed:[], histories:[], loading:false, poll:null};
+const state = {cards:[], pending:[], failed:[], histories:[], cats:{}, life:null, tk:{}, ledger:{}, changes:null, loaded:false, poll:null};
 
 function store(k,v){try{ if(v===undefined) return localStorage.getItem(k); if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v);}catch(e){return null}}
 const token = () => store("weave.token");
@@ -176,7 +253,7 @@ function settingsView(msg){
 
 function addView(prefill){
   let cat = store("weave.lastcat") || "mind";
-  app.innerHTML = header(`<button class="iconbtn" onclick="go('#')">Cancel</button>`) + `
+  app.innerHTML = header(`<button class="iconbtn" onclick="back()">Cancel</button>`) + `
   <label class="f" for="url">YouTube link</label>
   <input class="t" id="url" type="url" inputmode="url" placeholder="Paste a link" value="${esc(prefill||"")}">
   <label class="f">Category</label>
@@ -202,32 +279,114 @@ function addView(prefill){
   };
 }
 
-async function load(){
-  state.loading=true;
-  const [index, inbox, failed, hist] = await Promise.all([
+const LIFE = "life-top10";
+const LEVELNAME = {observed:"Observed",correlated:"Correlated",causal:"Causal",unknown:"Mechanism unknown"};
+const KINDNAME = {practice:"Do this",understanding:"Best current answer"};
+const VERB = {strengthens:"Strengthens",adds:"Adds to",narrows:"Narrows",contradicts:"Contradicts"};
+
+function render(html, tab){
+  app.innerHTML = html;
+  syncBar(tab);
+}
+function syncBar(tab){
+  const bar = document.getElementById("bar");
+  bar.hidden = !token();
+  bar.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
+}
+function back(){ if(history.length>1) history.back(); else go("#"); }
+const backBtn = `<button class="iconbtn" onclick="back()">Back</button>`;
+
+async function load(force){
+  if(state.loaded && !force) return;
+  const [index, inbox, failed, hist, cats, life] = await Promise.all([
     ghJSON("cards/index.json").catch(()=>null),
     gh("contents/inbox").catch(()=>null),
     gh("contents/failed").catch(()=>null),
-    gh("contents/history").catch(()=>null)
+    gh("contents/history").catch(()=>null),
+    ghJSON("categories.json").catch(()=>null),
+    ghJSON(`takeaways/${LIFE}.json`).catch(()=>null)
   ]);
   state.histories = (hist||[]).filter(f=>f.name.endsWith(".md")).map(f=>f.name.slice(0,-3)).filter(k=>CATNAME[k]);
   state.cards = index || [];
   state.pending = (inbox||[]).filter(f=>f.name.endsWith(".json"));
   state.failed = (failed||[]).filter(f=>f.name.endsWith(".json"));
-  state.loading=false;
+  state.cats = cats || {};
+  state.life = life;
+  state.tk = {}; state.ledger = {}; state.changes = null;
+  state.loaded = true;
+}
+async function takeaways(k){ if(!(k in state.tk)) state.tk[k] = await ghJSON(`takeaways/${k}.json`).catch(()=>null); return state.tk[k]; }
+async function changes(){ if(!state.changes) state.changes = await ghJSON("takeaways/changes.json").catch(()=>null) || {weeks:[]}; return state.changes; }
+async function ledger(k){
+  if(!(k in state.ledger)){
+    const t = await gh(`contents/ledger/${k}.jsonl`,{raw:true}).catch(()=>null);
+    state.ledger[k] = (t||"").split("\n").filter(Boolean).map(l=>{ try{ return JSON.parse(l); }catch(e){ return null; } }).filter(Boolean);
+  }
+  return state.ledger[k];
 }
 
-async function homeView(){
-  if(!token()) return settingsView();
-  app.innerHTML = header(`<button class="iconbtn" onclick="go('#settings')">Settings</button>`) + `<p class="hint">Loading your cards</p>`;
-  try{ await load(); }catch(e){ return settingsView(e.message); }
-  const cards = state.filter==="all" ? state.cards : state.cards.filter(c=>c.category===state.filter);
-  let html = header(`<button class="iconbtn" onclick="go('#settings')">Settings</button>`) + `
-  <button class="primary" onclick="go('#add')">Add a video</button>
-  <div class="chips" style="margin-top:16px">
-    <button class="chip" aria-pressed="${state.filter==="all"}" onclick="setFilter('all')">All</button>
-    ${CATS.map(([k,n])=>`<button class="chip" aria-pressed="${state.filter===k}" onclick="setFilter('${k}')">${esc(n)}</button>`).join("")}
-  </div>`;
+function weekLabel(w){ const m = String(w||"").match(/W(\d+)/); return m ? `week ${+m[1]}` : ""; }
+function costWord(v){ return v<=2 ? "low" : v===3 ? "medium" : "high"; }
+
+// One takeaway row: rank, score bar with range, the line, a two-line why, chips. Tap for the evidence.
+function takeawayRow(t, list, prev){
+  const r = t.ratings || {}, rg = t.range || [t.score,t.score];
+  const cats = list===LIFE ? (t.categories||[]).map(k=>`<span class="tchip">${esc(CATNAME[k]||k)}</span>`).join("") : "";
+  return `<div class="tk">
+    <button class="tkmain" onclick="this.parentNode.classList.toggle('open')" aria-label="Takeaway ${t.rank}">
+      <span class="rank">${t.rank}</span>
+      <span class="tkbody">
+        <span class="sbar" aria-label="Score ${t.score}, range ${rg[0]} to ${rg[1]}"><span class="rg" style="left:${rg[0]}%;width:${Math.max(1,rg[1]-rg[0])}%"></span><span class="fill" style="width:${t.score}%"></span></span>
+        <span class="sline"><b>${t.score}</b><small>range ${rg[0]} to ${rg[1]}</small>${t.tied_with_prev && prev ? `<small class="tie">roughly tied with #${prev.rank}</small>` : ""}</span>
+        <span class="tktext">${esc(t.text)}</span>
+        <span class="tkwhy">${esc(t.why)}</span>
+        <span class="tchips"><span class="tchip lv">${esc(LEVELNAME[t.level]||"Mechanism unknown")}</span><span class="tchip">Cost ${costWord(r.C)}</span><span class="tchip">Risk ${costWord(r.R)}</span>${t.philosophy?`<span class="tchip ph">Philosophy, not established science</span>`:""}${t.unverified_only?`<span class="tchip lead">Unverified leads only</span>`:""}${cats}</span>
+      </span>
+    </button>
+    <div class="tkmore">
+      <p class="kind">${esc(KINDNAME[t.kind]||"")}</p>
+      <div class="ings">${[["I","Impact"],["E","Evidence"],["B","Breadth"],["C","Cost"],["R","Risk"]].map(([k,n])=>`<span><small>${n}</small><b>${r[k]||"?"}</b>/5</span>`).join("")}</div>
+      ${t.unverified_only?`<p class="hint">Rests only on earlier research that has not been checked against a source yet, so evidence is capped at 2.</p>`:""}
+      <p class="sub">Supporting claims</p>
+      ${(t.support||[]).map(c=>`<div class="claim"><span class="ev ${esc(c.evidence)}"></span><div><p>${esc(c.claim)}</p><p class="hint">${claimSource(c)}</p></div></div>`).join("")}
+    </div>
+  </div>${t.drop_after?`<div class="drop"><span>Value falls off here</span></div>`:""}`;
+}
+function claimSource(c){
+  if(c.status) return "Lead from earlier research, unverified";
+  if(!c.url) return esc(c.title||"");
+  return `<a href="${esc(c.url)}${c.time?`&t=${secs(c.time)}s`:""}" target="_blank" rel="noopener">${esc(c.title||"Source")}${c.time?` at ${esc(c.time)}`:""}</a>`;
+}
+function secs(time){ return String(time).split(":").reduce((a,b)=>a*60+(+b||0),0); }
+function takeawayList(items, list){
+  return `<div class="tks">${items.map((t,i)=>takeawayRow(t, list, items[i-1])).join("")}</div>`;
+}
+
+function progress(k){
+  const qs = ((state.cats||{})[k]||{}).subquestions || [];
+  if(!qs.length) return `<p class="prog">No questions set up yet</p>`;
+  const n = s => qs.filter(q=>q.status===s).length;
+  const answered = n("answered"), partial = n("partial"), contested = n("contested"), open = qs.length-answered-partial-contested;
+  const seg = (c,cls) => c ? `<span class="${cls}" style="flex:${c}"></span>` : "";
+  return `<div class="pbar" aria-hidden="true">${seg(answered,"a")}${seg(partial,"p")}${seg(contested,"c")}${seg(open,"o")}</div>
+    <p class="prog">${qs.length} questions: ${answered?`${answered} answered, `:""}${partial} partly, ${contested} contested, ${open} open</p>`;
+}
+function tiles(){
+  const tops = (state.life||{}).category_tops || {};
+  return `<div class="grid">${CATS.map(([k,n])=>`<button class="tile" onclick="go('#cat/${k}')">
+    <span class="tname">${esc(n)}</span>
+    <span class="ttop">${tops[k] ? `<b>#1</b> ${esc(tops[k].text)}` : `<i>No takeaways yet</i>`}</span>
+    ${progress(k)}</button>`).join("")}</div>`;
+}
+function cardRow(c){
+  const share = c.ideas_total ? `<span>${c.ideas_new} of ${c.ideas_total} ideas new</span>` : "";
+  return `<button class="row" onclick="go('#card/${esc(c.id)}')">
+    <h3>${esc(c.title)}</h3><p>${esc(c.claim||c.about||"")}</p>
+    <div class="meta"><span>${c.minutes} min</span>${share}<span>Worth it ${dots(c.attention||1)}</span>${c.map&&c.map.some(m=>m.effect==="contradicts")?`<span style="color:var(--disputed);font-weight:600">Contradicts the map</span>`:""}<span>${when(c.added_at)}</span></div>
+  </button>`;
+}
+async function notices(){
+  let html = "";
   if(state.pending.length){
     html += `<p class="sectionhead">Being processed</p><div class="list">${state.pending.map(()=>`<div class="row pending"><h3>Reading the video</h3><p>Usually a few minutes. This page checks again on its own.</p></div>`).join("")}</div>`;
   }
@@ -235,44 +394,111 @@ async function homeView(){
     const items = await Promise.all(state.failed.map(f=>ghJSON(`failed/${f.name}`).catch(()=>null)));
     html += `<p class="sectionhead">Could not process</p><div class="list">${items.filter(Boolean).map(it=>`<div class="row failed"><h3>${esc(it.url)}</h3><p>${esc(it.error||"Unknown problem")}</p></div>`).join("")}</div>`;
   }
-  const hs = state.histories.filter(k=>state.filter==="all"||state.filter===k);
-  if(hs.length){
-    html += `<p class="sectionhead">Research history</p><div class="list">${hs.map(k=>`<button class="row" onclick="go('#history/${k}')"><h3>${esc(CATNAME[k])}</h3><p>How the thinking got here: what changed, what was corrected, and what it taught.</p></button>`).join("")}</div>`;
-  }
-  if(!cards.length && !state.pending.length){
-    html += `<div class="empty"><h2>Nothing here yet</h2><p class="hint" style="margin:0">Tap Share on any YouTube video, choose Weave, and pick a category. Or tap Add a video and paste a link.</p></div>`;
-  } else if(cards.length){
-    html += `<p class="sectionhead">${cards.length} card${cards.length>1?"s":""}</p><div class="list">${cards.map(c=>`
-      <button class="row" onclick="go('#card/${esc(c.id)}')">
-        <h3>${esc(c.title)}</h3><p>${esc(c.about||"")}</p>
-        <div class="meta"><span>${esc(CATNAME[c.category]||c.category)}</span><span>${c.minutes} min</span><span>Worth it ${dots(c.attention||1)}</span>${c.map&&c.map.some(m=>m.effect==="contradicts")?`<span style="color:var(--disputed);font-weight:600">Contradicts the map</span>`:""}<span>${when(c.added_at)}</span></div>
-      </button>`).join("")}</div>`;
-  }
-  app.innerHTML = html;
-  clearTimeout(state.poll);
-  if(state.pending.length && location.hash==="" ) state.poll=setTimeout(homeView, 30000);
+  return html;
 }
-function setFilter(k){ state.filter=k; homeView(); }
 
-async function cardView(id){
-  app.innerHTML = header(`<button class="iconbtn" onclick="go('#')">Back</button>`) + `<p class="hint">Opening card</p>`;
-  let c;
-  try{ c = await ghJSON(`cards/${id}.json`); }catch(e){ app.innerHTML += `<p class="err">${esc(e.message)}</p>`; return; }
-  if(!c){ app.innerHTML += `<p class="err">That card was not found.</p>`; return; }
+async function homeView(){
+  if(!token()) return settingsView();
+  const top = header(`<button class="iconbtn" onclick="go('#settings')">Settings</button>`);
+  if(!state.loaded) render(top + `<p class="hint">Loading</p>`, "home");
+  try{ await load(true); }catch(e){ return settingsView(e.message); }
+  const life = state.life;
+  let html = top + await notices();
+  html += `<div class="h2row"><h2 class="h2">Life Top 10</h2>${life?`<a href="#changes" class="small">${esc(weekLabel(life.week))} changes</a>`:""}</div>`;
+  html += life && life.items && life.items.length
+    ? `<p class="hint sub0">Ranked by what each gives back for what it costs.</p>` + takeawayList(life.items, LIFE)
+    : `<div class="empty"><p class="hint" style="margin:0">Your first ranking appears after the weekly run.</p></div>`;
+  html += `<h2 class="h2">Categories</h2>` + tiles();
+  if(state.cards.length) html += `<h2 class="h2">Latest cards</h2><div class="list">${state.cards.slice(0,3).map(cardRow).join("")}</div>`;
+  else if(!state.pending.length) html += `<div class="empty"><h2>No cards yet</h2><p class="hint" style="margin:0">Tap Share on any YouTube video, choose Weave, and pick a category. Or tap Add.</p></div>`;
+  render(html, "home");
+  clearTimeout(state.poll);
+  if(state.pending.length && !location.hash) state.poll = setTimeout(homeView, 30000);
+}
+
+async function catsView(){
+  render(header(`<button class="iconbtn" onclick="go('#settings')">Settings</button>`) + `<p class="hint">Loading</p>`, "cats");
+  try{ await load(); }catch(e){ return settingsView(e.message); }
+  render(header(`<button class="iconbtn" onclick="go('#settings')">Settings</button>`) + `<h2 class="h2">Categories</h2>` + tiles(), "cats");
+}
+
+const TABS = [["top","Top 10"],["map","Map"],["sources","Sources"],["history","History"]];
+async function categoryView(k, tab){
+  if(!CATNAME[k]) return go("#");
+  tab = TABS.some(t=>t[0]===tab) ? tab : "top";
+  const head = header(backBtn) + `<p class="hint" style="margin:0">Category</p><h1 class="ctitle">${esc(CATNAME[k])}</h1>
+    <nav class="tabs" role="tablist">${TABS.map(([t,n])=>`<button role="tab" aria-selected="${t===tab}" onclick="location.replace('#cat/${k}/${t}')">${n}</button>`).join("")}</nav>`;
+  render(head + `<p class="hint">Loading</p>`, "cats");
+  let body = "";
+  try{
+    await load();
+    if(tab==="top") body = await topTab(k);
+    else if(tab==="map") body = await mapTab(k);
+    else if(tab==="sources") body = sourcesTab(k);
+    else body = await historyTab(k, k);
+  }catch(e){ body = `<p class="err">${esc(e.message)}</p>`; }
+  render(head + body, "cats");
+}
+async function topTab(k){
+  const d = await takeaways(k);
+  const q = ((state.cats||{})[k]||{}).question;
+  let html = q ? `<p class="gq">${esc(q)}</p>` : "";
+  if(!d || !d.items || !d.items.length) return html + `<div class="empty"><p class="hint" style="margin:0">No takeaways yet. They are built each week from the cards you add here.</p></div>`;
+  return html + `<p class="hint sub0" style="margin-top:12px">Updated ${esc(weekLabel(d.week))}. Tap a row for the evidence.</p>` + takeawayList(d.items, k);
+}
+async function mapTab(k){
+  const cat = (state.cats||{})[k] || {};
+  const qs = cat.subquestions || [];
+  if(!qs.length) return `<div class="empty"><p class="hint" style="margin:0">No sub-questions set up for this category yet.</p></div>`;
+  const L = await ledger(k);
+  const cards = state.cards.filter(c=>c.category===k);
+  const STATUS = {answered:"Answered",partial:"Partly answered",contested:"Contested",open:"Open"};
+  let html = `<div style="margin-top:12px">${progress(k)}</div>`, track = null;
+  qs.forEach(q=>{
+    if(q.track && q.track!==track){ track=q.track; html += `<p class="sectionhead">${esc((cat.tracks||{})[track]||track)}</p>`; }
+    const claims = L.filter(c=>c.q===q.id && c.status!=="rejected by prior research");
+    const verified = claims.filter(c=>!c.status), leads = claims.filter(c=>c.status);
+    const touched = cards.filter(c=>(c.map||[]).some(m=>m.q===q.id));
+    html += `<div class="tk"><button class="qrow" onclick="this.parentNode.classList.toggle('open')">
+      <span class="qid">${esc(q.id)}</span><span class="tkbody"><span class="tktext">${esc(q.text)}</span>
+      <span class="tchips"><span class="tchip st-${esc(q.status||"open")}">${esc(STATUS[q.status]||"Open")}</span><span class="tchip">${verified.length} checked</span><span class="tchip">${leads.length} leads</span>${touched.length?`<span class="tchip">${touched.length} card${touched.length>1?"s":""}</span>`:""}</span></span></button>
+      <div class="tkmore">${claims.length?claims.map(c=>`<div class="claim"><span class="ev ${esc(c.evidence)}"></span><div><p>${esc(c.claim)}</p><p class="hint">${claimSource(c)}</p></div></div>`).join(""):`<p class="hint">No claims yet.</p>`}
+      ${touched.map(c=>`<p class="hint"><a href="#card/${esc(c.id)}">${esc(c.title)}</a>: ${esc(((c.map||[]).find(m=>m.q===q.id)||{}).effect||"")}</p>`).join("")}</div></div>`;
+  });
+  return html;
+}
+function sourcesTab(k){
+  const cards = state.cards.filter(c=>c.category===k);
+  return cards.length ? `<div class="list">${cards.map(cardRow).join("")}</div>`
+    : `<div class="empty"><p class="hint" style="margin:0">No cards in this category yet.</p></div>`;
+}
+async function historyTab(list, k){
+  const ch = await changes();
+  let html = "";
+  const weeks = (ch.weeks||[]).map(w=>({w, moves:(w.moves||[]).filter(m=>m.list===list)})).filter(x=>x.moves.length);
+  html += weeks.length ? weeks.map(({w,moves})=>`<p class="sectionhead">${esc(weekLabel(w.week)).replace(/^w/,"W")}</p><div class="list">${moves.map(m=>{
+      const what = m.from==null ? `New at #${m.to}` : m.to==null ? `Left the list from #${m.from}` : m.to<m.from ? `Rose from #${m.from} to #${m.to}` : m.to>m.from ? `Fell from #${m.from} to #${m.to}` : `Stayed at #${m.to}`;
+      const sc = m.score_from!=null && m.score_to!=null && m.score_from!==m.score_to ? `, score ${m.score_from} to ${m.score_to}` : (m.score_to!=null && m.from==null ? `, score ${m.score_to}` : "");
+      const why = m.from==null && m.reason==="New this week" ? "" : ` ${esc(m.reason||"")}`;
+      return `<div class="row"><h3>${esc(m.text||m.id)}</h3><p>${what}${sc}.${why}</p></div>`;}).join("")}</div>`).join("")
+    : `<div class="empty"><p class="hint" style="margin:0">No weekly changes yet.</p></div>`;
+  if(k && state.histories.includes(k)) html += `<p class="sectionhead">Before Weave</p><div class="list"><button class="row" onclick="go('#history/${k}')"><h3>Research story</h3><p>How the thinking got here: what changed, what was corrected, and what it taught.</p></button></div>`;
+  return html;
+}
+async function changesView(){
+  render(header(backBtn) + `<p class="hint">Loading</p>`, "home");
+  let body;
+  try{ body = await historyTab(LIFE, null); }catch(e){ body = `<p class="err">${esc(e.message)}</p>`; }
+  render(header(backBtn) + `<h1 class="ctitle">Life Top 10: weekly changes</h1>` + body, "home");
+}
+
+function detailsHTML(c){
   const yt = t => `https://www.youtube.com/watch?v=${c.video_id}&t=${Math.floor(t)}s`;
-  const contra = (c.map||[]).filter(m=>m.effect==="contradicts");
   const others = (c.map||[]).filter(m=>m.effect!=="contradicts");
-  const verb = {strengthens:"Strengthens",adds:"Adds to",narrows:"Narrows",contradicts:"Contradicts"};
-  const mapItems = arr => arr.map(m=>`<div class="mapitem"><span class="badge ${m.effect}">${verb[m.effect]} ${esc(m.q)}</span><span>${esc(m.note||"")}</span></div>`).join("");
+  const mapItems = arr => arr.map(m=>`<div class="mapitem"><span class="badge ${m.effect}">${VERB[m.effect]} ${esc(m.q)}</span><span>${esc(m.note||"")}</span></div>`).join("");
   const density = s => s.points.length===0?"":(s.points.length<3?"d1":(s.points.length<6?"d2":"d3"));
-  let html = header(`<button class="iconbtn" onclick="go('#')">Back</button>`) + `<article class="card">
-    <p class="hint" style="margin:0">${esc(c.category_name||"")}${c.channel?`, ${esc(c.channel)}`:""}</p>
-    <h1>${esc(c.title)}</h1>
-    <div class="saved"><span><b>${c.minutes}</b> min saved</span><span>Worth your attention ${dots(c.attention)} ${attentionLabel(c.attention)}</span></div>
-    ${c.transcript_source==="ai"?`<p class="hint">No captions were available, so the transcript was written by AI and may not be word for word.</p>`:""}
-    ${contra.length?`<section class="block alert"><h2>This contradicts the map</h2><div class="map">${mapItems(contra)}</div></section>`:""}
-    <section class="block"><h2>Explain like I'm 5</h2><p class="eli5">${esc(c.eli5)}</p></section>
-    <section class="block"><h2>Our map</h2>${others.length?`<div class="map">${mapItems(others)}</div>`:""}${c.nothing_new?`<p class="hint" style="margin:${others.length?"8px":"0"} 0 0">Nothing new for the map. Safe to skip.</p>`:(!others.length&&!contra.length?`<p class="hint" style="margin:0">No sub-questions set up for this category yet.</p>`:"")}</section>
+  let html = `<section class="block"><h2>Explain like I'm 5</h2><p class="eli5">${esc(c.eli5)}</p></section>
+    <section class="block"><h2>Our map</h2>${others.length?`<div class="map">${mapItems(others)}</div>`:""}${c.nothing_new?`<p class="hint" style="margin:${others.length?"8px":"0"} 0 0">Nothing new for the map. Safe to skip.</p>`:(!(c.map||[]).length?`<p class="hint" style="margin:0">No sub-questions set up for this category yet.</p>`:"")}</section>
     <section class="block"><h2>Coverage</h2>
       <div class="thread" aria-hidden="true">${c.sections.map(s=>`<span class="${density(s)}"></span>`).join("")}</div>
       <p class="hint" style="margin:6px 0 0">${c.coverage.with_points} of ${c.coverage.sections} sections had key points.${c.rejected_points?` ${c.rejected_points} point${c.rejected_points>1?"s were":" was"} dropped because the quote could not be found in the transcript.`:""}</p>
@@ -283,13 +509,44 @@ async function cardView(id){
     if(!s.points.length) html += `<p class="skip">No key points: ${esc(s.skip_reason)}</p>`;
     s.points.forEach(p=>{
       html += `<div class="pt"><div class="imp">${dots(p.importance)}</div><div><p>${esc(p.point)}</p>
-        <div class="tags"><span class="ev ${p.evidence}">${EVNAME[p.evidence]||p.evidence}</span><a class="ts" href="${yt(p.t)}" target="_blank" rel="noopener">Play ${esc(p.time)}</a></div></div>
+        <div class="tags"><span class="ev ${p.evidence}">${EVNAME[p.evidence]||p.evidence}</span><a class="ts" href="${yt(p.t)}" target="_blank" rel="noopener">Play ${esc(p.time)}</a>${p.same_as?`<span class="hint">In your map</span>`:""}</div></div>
         ${p.use_it?`<div class="useit"><b>Use it:</b> ${esc(p.use_it)}</div>`:""}</div>`;
     });
     html += `</section>`;
   });
-  html += `<section class="block" style="margin-top:28px"><a href="${esc(c.url)}" target="_blank" rel="noopener">Open the video</a> &nbsp; <a href="https://github.com/${esc(repo())}/blob/main/transcripts/${esc(c.video_id)}.json" target="_blank" rel="noopener">Full transcript</a></section></article>`;
-  app.innerHTML = html; window.scrollTo(0,0);
+  return html;
+}
+function ideasHTML(c){
+  const known = {}; (c.matches||[]).forEach(m=>known[`${m.section}/${m.point}`]=m);
+  const fresh = [], seen = [];
+  c.sections.forEach((s,si)=>s.points.forEach((p,pi)=>{ const m = known[`${si}/${pi}`]; (m?seen:fresh).push({p,m}); }));
+  return `<p class="sub">New to your map</p>${fresh.length?fresh.map(({p})=>`<div class="claim"><span class="ev ${p.evidence}"></span><div><p>${esc(p.point)}</p><p class="hint">${esc(p.time)}</p></div></div>`).join(""):`<p class="hint">None.</p>`}
+    <p class="sub">Already in your map</p>${seen.length?seen.map(({p,m})=>`<div class="claim"><span class="ev ${p.evidence}"></span><div><p>${esc(p.point)}</p><p class="hint">Matches: ${esc(m.claim)}${m.prior?" (an unverified lead, now backed by this video)":""}</p></div></div>`).join(""):`<p class="hint">None.</p>`}`;
+}
+
+async function cardView(id){
+  render(header(backBtn) + `<p class="hint">Opening card</p>`, "");
+  let c;
+  try{ c = await ghJSON(`cards/${id}.json`); }catch(e){ app.innerHTML += `<p class="err">${esc(e.message)}</p>`; return; }
+  if(!c){ app.innerHTML += `<p class="err">That card was not found.</p>`; return; }
+  const contra = (c.map||[]).filter(m=>m.effect==="contradicts");
+  const short = !!c.claim;
+  let html = header(backBtn) + `<article class="card">
+    <p class="hint" style="margin:0">${esc(c.category_name||"")}${c.channel?`, ${esc(c.channel)}`:""}</p>
+    <h1>${esc(c.title)} <span class="mins">(${c.minutes} min)</span></h1>
+    ${c.transcript_source==="ai"?`<p class="hint">No captions were available, so the transcript was written by AI and may not be word for word.</p>`:""}
+    ${contra.length?`<section class="block alert"><h2>This contradicts the map</h2><div class="map">${contra.map(m=>`<div class="mapitem"><span class="badge contradicts">Contradicts ${esc(m.q)}</span><span>${esc(m.note||"")}</span></div>`).join("")}</div></section>`:""}
+    ${short?`<section class="block short">
+      <div class="kv"><span class="k">Claim</span><p>${esc(c.claim)}</p></div>
+      <div class="kv"><span class="k">Happening</span><p>${esc(c.happening)}</p>
+        <p class="tchips"><span class="tchip lv">Science level: ${esc((LEVELNAME[c.science_level]||"unknown").toLowerCase())}</span>${c.philosophy?`<span class="tchip ph">Philosophy, not established science</span>`:""}</p></div>
+      <div class="kv"><span class="k">Left</span><p class="left">${esc(c.left)}</p></div>
+      ${c.ideas_total!=null?`<button class="kv ideas" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden" aria-label="Show which ideas were new"><span class="k">Ideas</span><p>${c.ideas_total} total · ${c.ideas_known} already in your map · ${c.ideas_new} new</p></button><div class="ideaslist" hidden>${ideasHTML(c)}</div>`:""}
+    </section>`:`<section class="block"><h2>About</h2><p class="eli5">${esc(c.about)}</p><p class="hint" style="margin:8px 0 0">This card was made before short cards. Details has everything.</p></section>`}
+    <button class="detailsbtn" onclick="const d=document.getElementById('details'); d.hidden=!d.hidden; this.textContent=d.hidden?'Details':'Hide details'">Details</button>
+    <div id="details" hidden>${detailsHTML(c)}</div>
+    <section class="block" style="margin-top:20px"><a href="${esc(c.url)}" target="_blank" rel="noopener">Open the video</a> &nbsp; <a href="https://github.com/${esc(repo())}/blob/main/transcripts/${esc(c.video_id)}.json" target="_blank" rel="noopener">Full transcript</a></section></article>`;
+  render(html, ""); window.scrollTo(0,0);
 }
 
 // Small Markdown reader for the history files: headings, paragraphs, lists, tables, bold, italic, links.
@@ -318,11 +575,11 @@ function md(src){
 }
 
 async function historyView(key){
-  app.innerHTML = header(`<button class="iconbtn" onclick="go('#')">Back</button>`) + `<p class="hint">Opening history</p>`;
+  app.innerHTML = header(backBtn) + `<p class="hint">Opening history</p>`;
   let text;
   try{ text = /^[a-z0-9_-]+$/.test(key) ? await gh(`contents/history/${key}.md`,{raw:true}) : null; }catch(e){ app.innerHTML += `<p class="err">${esc(e.message)}</p>`; return; }
   if(!text){ app.innerHTML += `<p class="err">That history was not found.</p>`; return; }
-  app.innerHTML = header(`<button class="iconbtn" onclick="go('#')">Back</button>`) + `<article class="doc">
+  app.innerHTML = header(backBtn) + `<article class="doc">
     <p class="hint" style="margin:0">${esc(CATNAME[key]||key)}</p>
     <p class="hint" style="margin:2px 0 0">Research history from your earlier ChatGPT project. Read it as history, not as checked findings.</p>
     ${md(text)}</article>`;
@@ -333,10 +590,12 @@ function go(h){ if(location.hash===h || (h==="#" && !location.hash)) route(); el
 function route(){
   clearTimeout(state.poll);
   const h = location.hash;
-  if(!token() && h!=="#settings") return settingsView();
-  if(h==="#settings") return settingsView();
-  if(h==="#add") return addView("");
-  if(h.startsWith("#history/")) return historyView(decodeURIComponent(h.slice(9)));
+  if(!token() || h==="#settings"){ settingsView(); return syncBar(""); }
+  if(h==="#add"){ addView(""); return syncBar("add"); }
+  if(h==="#cats") return catsView();
+  if(h==="#changes") return changesView();
+  if(h.startsWith("#cat/")){ const [k,tab] = decodeURIComponent(h.slice(5)).split("/"); return categoryView(k, tab); }
+  if(h.startsWith("#history/")){ historyView(decodeURIComponent(h.slice(9))); return syncBar("cats"); }
   if(h.startsWith("#card/")) return cardView(decodeURIComponent(h.slice(6)));
   return homeView();
 }
@@ -348,10 +607,10 @@ window.addEventListener("hashchange", route);
   if(q.has("share") || q.has("url") || q.has("text")){
     const link = q.get("url") || findUrl(q.get("text")) || findUrl(q.get("title"));
     if(!token()) { store("weave.pendingshare", link); return settingsView("Connect your vault first. Your shared link is kept."); }
-    return addView(link);
+    addView(link); return syncBar("add");
   }
   const pend = store("weave.pendingshare");
-  if(pend && token()){ store("weave.pendingshare", null); return addView(pend); }
+  if(pend && token()){ store("weave.pendingshare", null); addView(pend); return syncBar("add"); }
   route();
 })();
 
