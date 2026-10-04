@@ -95,3 +95,47 @@ Outputs in the vault: `takeaways/<category>.json`, `takeaways/life.json`, `takea
 - **Takeaway row:** rank, score bar with its range, the one-line instruction or conclusion, a two-line
   why, and small chips for science level, cost and risk. Tap for the supporting claims and sources.
 - Plain, short, sentence-case copy. No em dashes in anything Rohit reads.
+
+## 5. Version 2: one app to understand the world, decide well and grow
+
+This section supersedes the layout in section 4. Rohit wants less reading and more seeing. Every item
+must be either a specific action or a clear conclusion. Generic advice is not allowed: "sleep well"
+fails; "lights out by 11, phone outside the bedroom, for 14 days, rate how rested you feel 1 to 5"
+passes.
+
+### Profile
+A private `profile.json` in the vault, edited from Settings in the app: age range, goals for the next
+10 years, health markers he chooses to track (optional), his businesses and role, family priorities,
+and realistic daily time. Every tab fits its items to the profile. If a field is missing and matters,
+ask once in the app.
+
+### Tabs (bottom bar: Today, World, Learn, Life, plus a central Add)
+Cards and categories move to a Library reachable from a menu.
+
+**Today.** At most three moves for today or this week. Each: the exact action, how long, how to know
+it worked, a one-line why, and a link to the evidence. Tick to complete; keep a history. Drawn from the
+highest-Leverage takeaways fitted to the profile, rotated so it does not repeat stale items.
+
+**World.** A visual horizon timeline at 1, 3, 5 and 10 years, in lanes: Health, AI and tech, Rohit's
+industries (footwear, batteries, sports facilities, property), Money. Each item: what is coming, its
+status (claimed, in trials or pilots, approved or adopted), likelihood (low, medium, high, judged from
+checkable signposts), what it means for him, and what to do now. Items are dots on the timeline; tap
+to expand. Major events are always marked claimed or verified (example: the Navier-Stokes claim in
+September 2026 is claimed, not verified). The weekly run may use limited web search for World items
+(at most 10 searches a week) and must cite every source.
+
+**Learn.** One big idea per day in bare form (at most 120 words): core models from maths, physics,
+biology, history, economics, psychology, philosophy and contemplative traditions, plus notable frontier
+facts (for example the Millennium Prize Problems). Favour ideas that apply widely. Two quick recall
+questions, then spaced repetition at 1, 3, 7 and 21 days. Mind, consciousness and reality content
+lives here as well. The weekly run writes the next 7 ideas into `learn/` in the vault.
+
+**Life.** A life portfolio: health, family, wealth, growth, meaning. Rohit sets the weights with
+sliders. Show the evidence base in 3 to 5 short cards (end-of-life regrets, the strongest predictors
+of long and good lives, what compounds), then Big Moves: 3 to 5 highest-leverage decisions shown as
+bars. A weekly check compares what he actually did in Today against his weights. Mortality is framed
+as a time horizon, calmly.
+
+### Visual rules
+Icons, colour, bars and the timeline carry meaning. At most two lines of text per item by default;
+everything else on tap. One screen should answer "what do I do" in under ten seconds.
