@@ -1,5 +1,8 @@
 # Weave: briefing for Claude Code
 
+**Read SPEC.md first.** It is the product definition: card format, repeat detection, the weekly
+Leverage Score and Top 10s, and the layout. Build toward it.
+
 Weave is Rohit's personal research app. He shares a YouTube video from his Android phone into a
 category, and gets back a card that replaces watching it: an ELI5, every critical point by section
 with evidence labels and timestamps, and how the video changes his research map.
