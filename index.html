@@ -262,7 +262,7 @@ async function cardView(id){
   const yt = t => `https://www.youtube.com/watch?v=${c.video_id}&t=${Math.floor(t)}s`;
   const contra = (c.map||[]).filter(m=>m.effect==="contradicts");
   const others = (c.map||[]).filter(m=>m.effect!=="contradicts");
-  const verb = {strengthens:"Strengthens",adds:"Adds to",contradicts:"Contradicts"};
+  const verb = {strengthens:"Strengthens",adds:"Adds to",narrows:"Narrows",contradicts:"Contradicts"};
   const mapItems = arr => arr.map(m=>`<div class="mapitem"><span class="badge ${m.effect}">${verb[m.effect]} ${esc(m.q)}</span><span>${esc(m.note||"")}</span></div>`).join("");
   const density = s => s.points.length===0?"":(s.points.length<3?"d1":(s.points.length<6?"d2":"d3"));
   let html = header(`<button class="iconbtn" onclick="go('#')">Back</button>`) + `<article class="card">
