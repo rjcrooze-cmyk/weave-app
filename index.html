@@ -89,6 +89,16 @@ textarea.t{min-height:80px;resize:vertical}
 .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.82rem;margin-top:8px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:12px;max-width:90%;z-index:10}
 .err{color:var(--disputed);margin-top:10px}
+.doc h2{font-family:var(--serif);font-size:1.25rem;line-height:1.25;margin:30px 0 8px;font-weight:600}
+.doc h3{font-size:1rem;margin:20px 0 6px}
+.doc p,.doc li{font-family:var(--serif);font-size:1.06rem;line-height:1.55}
+.doc p{margin:0 0 12px}
+.doc ul,.doc ol{margin:0 0 12px;padding-left:1.4em}
+.doc li{margin-bottom:6px}
+.trow{background:var(--surface);border-radius:12px;padding:12px 14px;margin:8px 0}
+.trow p{margin:6px 0 0;font-size:.98rem}
+.trow p:first-child{margin-top:0;font-weight:600}
+.trow .k{display:block;font-family:var(--sans);font-weight:600;font-size:.8rem;color:var(--muted)}
 a{color:var(--thread)}
 @media (prefers-reduced-motion: no-preference){.toast{animation:rise .25s ease-out}@keyframes rise{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}}
 </style>
@@ -107,7 +117,7 @@ const CATNAME = Object.fromEntries(CATS);
 const EVNAME = {established:"Established",emerging:"Emerging",disputed:"Disputed",opinion:"Speaker's opinion",experience:"Experience report"};
 const DEFAULT_REPO = "rjcrooze-cmyk/weave-vault";
 const app = document.getElementById("app");
-const state = {filter:"all", cards:[], pending:[], failed:[], loading:false, poll:null};
+const state = {filter:"all", cards:[], pending:[], failed:[], histories:[], loading:false, poll:null};
 
 function store(k,v){try{ if(v===undefined) return localStorage.getItem(k); if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v);}catch(e){return null}}
 const token = () => store("weave.token");
@@ -194,11 +204,13 @@ function addView(prefill){
 
 async function load(){
   state.loading=true;
-  const [index, inbox, failed] = await Promise.all([
+  const [index, inbox, failed, hist] = await Promise.all([
     ghJSON("cards/index.json").catch(()=>null),
     gh("contents/inbox").catch(()=>null),
-    gh("contents/failed").catch(()=>null)
+    gh("contents/failed").catch(()=>null),
+    gh("contents/history").catch(()=>null)
   ]);
+  state.histories = (hist||[]).filter(f=>f.name.endsWith(".md")).map(f=>f.name.slice(0,-3)).filter(k=>CATNAME[k]);
   state.cards = index || [];
   state.pending = (inbox||[]).filter(f=>f.name.endsWith(".json"));
   state.failed = (failed||[]).filter(f=>f.name.endsWith(".json"));
@@ -222,6 +234,10 @@ async function homeView(){
   if(state.failed.length){
     const items = await Promise.all(state.failed.map(f=>ghJSON(`failed/${f.name}`).catch(()=>null)));
     html += `<p class="sectionhead">Could not process</p><div class="list">${items.filter(Boolean).map(it=>`<div class="row failed"><h3>${esc(it.url)}</h3><p>${esc(it.error||"Unknown problem")}</p></div>`).join("")}</div>`;
+  }
+  const hs = state.histories.filter(k=>state.filter==="all"||state.filter===k);
+  if(hs.length){
+    html += `<p class="sectionhead">Research history</p><div class="list">${hs.map(k=>`<button class="row" onclick="go('#history/${k}')"><h3>${esc(CATNAME[k])}</h3><p>How the thinking got here: what changed, what was corrected, and what it taught.</p></button>`).join("")}</div>`;
   }
   if(!cards.length && !state.pending.length){
     html += `<div class="empty"><h2>Nothing here yet</h2><p class="hint" style="margin:0">Tap Share on any YouTube video, choose Weave, and pick a category. Or tap Add a video and paste a link.</p></div>`;
@@ -276,6 +292,43 @@ async function cardView(id){
   app.innerHTML = html; window.scrollTo(0,0);
 }
 
+// Small Markdown reader for the history files: headings, paragraphs, lists, tables, bold, italic, links.
+function md(src){
+  const inline = t => esc(t).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>').replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\*(.+?)\*/g,"<i>$1</i>");
+  const cells = l => l.trim().replace(/^\||\|$/g,"").split("|").map(c=>c.trim());
+  const L = String(src).replace(/\r/g,"").split("\n"); let out="", i=0;
+  const special = l => /^(#{1,3}\s|- |\d+\.\s|\|)/.test(l);
+  while(i<L.length){
+    const l=L[i];
+    if(!l.trim()){ i++; continue; }
+    let m;
+    if((m=l.match(/^(#{1,3})\s+(.*)/))){ out+=`<h${m[1].length===1?2:m[1].length}>${inline(m[2])}</h${m[1].length===1?2:m[1].length}>`; i++; continue; }
+    if(l.startsWith("|")){
+      const rows=[]; while(i<L.length && L[i].startsWith("|")) rows.push(cells(L[i++]));
+      const head=rows[0], body=rows.slice(2);
+      out+=body.map(r=>`<div class="trow">${r.map((c,j)=>j===0?`<p>${inline(c)}</p>`:`<p><span class="k">${inline(head[j]||"")}</span>${inline(c)}</p>`).join("")}</div>`).join("");
+      continue;
+    }
+    if(l.startsWith("- ")){ let li=""; while(i<L.length && L[i].startsWith("- ")) li+=`<li>${inline(L[i++].slice(2))}</li>`; out+=`<ul>${li}</ul>`; continue; }
+    if((m=l.match(/^(\d+)\.\s+(.*)/))){ out+=`<ol start="${m[1]}"><li>${inline(m[2])}</li></ol>`; i++; continue; }
+    let para=[]; while(i<L.length && L[i].trim() && !special(L[i])) para.push(L[i++]);
+    out+=`<p>${inline(para.join(" "))}</p>`;
+  }
+  return out;
+}
+
+async function historyView(key){
+  app.innerHTML = header(`<button class="iconbtn" onclick="go('#')">Back</button>`) + `<p class="hint">Opening history</p>`;
+  let text;
+  try{ text = /^[a-z0-9_-]+$/.test(key) ? await gh(`contents/history/${key}.md`,{raw:true}) : null; }catch(e){ app.innerHTML += `<p class="err">${esc(e.message)}</p>`; return; }
+  if(!text){ app.innerHTML += `<p class="err">That history was not found.</p>`; return; }
+  app.innerHTML = header(`<button class="iconbtn" onclick="go('#')">Back</button>`) + `<article class="doc">
+    <p class="hint" style="margin:0">${esc(CATNAME[key]||key)}</p>
+    <p class="hint" style="margin:2px 0 0">Research history from your earlier ChatGPT project. Read it as history, not as checked findings.</p>
+    ${md(text)}</article>`;
+  window.scrollTo(0,0);
+}
+
 function go(h){ if(location.hash===h || (h==="#" && !location.hash)) route(); else location.hash=h; }
 function route(){
   clearTimeout(state.poll);
@@ -283,6 +336,7 @@ function route(){
   if(!token() && h!=="#settings") return settingsView();
   if(h==="#settings") return settingsView();
   if(h==="#add") return addView("");
+  if(h.startsWith("#history/")) return historyView(decodeURIComponent(h.slice(9)));
   if(h.startsWith("#card/")) return cardView(decodeURIComponent(h.slice(6)));
   return homeView();
 }
