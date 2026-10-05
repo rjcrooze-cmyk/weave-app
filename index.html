@@ -246,6 +246,16 @@ select.t{appearance:auto}
 .cmpn{font-size:.8rem;color:var(--muted);text-align:right}
 .claimp{margin:10px 0 6px;font-size:.93rem}
 .tktext .ev{display:inline-flex;vertical-align:middle}
+.idea{background:var(--surface);border-radius:14px;padding:16px}
+.ititle{font-family:var(--serif);font-size:1.35rem;line-height:1.25;margin:8px 0 6px}
+.ibody{font-family:var(--serif);font-size:1.08rem;line-height:1.55;margin:0}
+.iapp{margin:12px 0 0;font-size:.95rem}.iapp .k{display:block}
+.tkmore .idea{padding:12px 0 0}
+.quiz{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.qa{background:var(--surface);border-radius:12px;padding:12px 14px}
+.tkmore .qa{background:var(--bg)}
+.q{margin:0 0 8px;font-weight:600}
+.ans p{margin:0 0 10px;font-family:var(--serif)}
 a{color:var(--thread)}
 @media (prefers-reduced-motion: no-preference){.toast{animation:rise .25s ease-out}@keyframes rise{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}}
 </style>
@@ -917,9 +927,64 @@ function lifeView(){
   });
 }
 
-function comingView(tab, name){
-  return v2Page(tab, async ()=>`<h1 class="ctitle">${name}</h1><div class="empty"><p class="hint" style="margin:0">Arrives in the next update.</p></div>`);
+// ---------------------------------------------------------------- Learn
+
+const INTERVALS = [1,3,7,21];
+const FIELDNAME = {maths:"Maths",physics:"Physics",biology:"Biology",history:"History",economics:"Economics",psychology:"Psychology",philosophy:"Philosophy",contemplative:"Contemplative",mind:"Mind and reality",frontier:"Frontier"};
+// After learning: due in 1 day. Got both right: next interval (3, 7, 21), then done. Missed one: back to 1 day.
+function nextReview(r, got, day){
+  const stage = got ? (r ? r.stage + 1 : 0) : 0;
+  const history = [...((r && r.history) || []), {date: day, got}];
+  return stage >= INTERVALS.length ? {stage, due: null, history} : {stage, due: addDays(day, INTERVALS[stage]), history};
 }
+function quizHTML(idea, mode){
+  return `<div class="quiz" data-id="${esc(idea.id)}" data-mode="${mode}">${idea.questions.map((q,i)=>`<div class="qa" data-i="${i}">
+    <p class="q">${esc(q.q)}</p>
+    <button class="iconbtn reveal" onclick="revealAnswer(this)">Show answer</button>
+    <div class="ans" hidden><p>${esc(q.a)}</p><div class="askbtns"><button class="primary sm" onclick="markAnswer(this,true)">Got it</button><button class="iconbtn" onclick="markAnswer(this,false)">Missed</button></div></div>
+  </div>`).join("")}</div>`;
+}
+function revealAnswer(b){ b.hidden = true; b.nextElementSibling.hidden = false; }
+async function markAnswer(b, got){
+  const qa = b.closest(".qa"), quiz = b.closest(".quiz");
+  qa.dataset.got = got; qa.querySelector(".askbtns").innerHTML = `<span class="tchip ${got?"st-adopted":"st-claimed"}">${got?"Got it":"Missed"}</span>`;
+  const all = [...quiz.querySelectorAll(".qa")];
+  if(all.some(x=>x.dataset.got==null)) return;
+  const id = quiz.dataset.id, ok = all.every(x=>x.dataset.got==="true"), day = isoDay();
+  try{
+    const next = await updateFile("app/reviews.json", d=>{ const ideas = (d && d.ideas) || {}; ideas[id] = nextReview(ideas[id], quiz.dataset.mode==="new" ? true : ok, day); return {ideas}; },
+      `Review ${id}`);
+    state.v2.reviews = next.ideas;
+    const r = next.ideas[id];
+    quiz.insertAdjacentHTML("beforeend", `<p class="hint">${r.due ? `Next review ${esc(prettyDay(r.due))}.` : "Learned. No more reviews needed."}</p>`);
+  }catch(e){ toast(e.message); }
+}
+function ideaCard(i, open){
+  return `<article class="idea ${open?"open":""}"><p class="tchips"><span class="tchip lv">${esc(FIELDNAME[i.field]||i.field)}</span><span class="tchip">${esc(prettyDay(i.date))}</span></p>
+    <h2 class="ititle">${esc(i.title)}</h2><p class="ibody">${esc(i.body)}</p>
+    <p class="iapp"><span class="k">Use it</span>${esc(i.applies)}</p>
+    ${(i.sources||[]).length?`<p class="hint">${i.sources.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>`).join("<br>")}</p>`:""}</article>`;
+}
+function learnView(){
+  return v2Page("learn", async ()=>{
+    const [ideasFile, reviews] = await Promise.all([ghJSON("learn/ideas.json").catch(()=>null), ghJSON("app/reviews.json").catch(()=>null)]);
+    const ideas = (ideasFile && ideasFile.ideas) || [], R = state.v2.reviews = (reviews && reviews.ideas) || {}, day = isoDay();
+    if(!ideas.length) return `<h1 class="ctitle">Learn</h1><div class="empty"><p class="hint" style="margin:0">Ideas arrive with the weekly run.</p></div>`;
+    const past = ideas.filter(i=>i.date<=day);
+    const todayIdea = past[past.length-1] || ideas[0];
+    let html = `<h1 class="ctitle">Today's idea</h1>` + ideaCard(todayIdea, true);
+    html += R[todayIdea.id] ? `<p class="hint">You have recalled this one. ${R[todayIdea.id].due?`Next review ${esc(prettyDay(R[todayIdea.id].due))}.`:"Learned."}</p>`
+      : `<h2 class="h2">Recall</h2><p class="hint sub0">Answer in your head, then check.</p>` + quizHTML(todayIdea, "new");
+    const due = ideas.filter(i=>i.id!==todayIdea.id && R[i.id] && R[i.id].due && R[i.id].due<=day);
+    if(due.length) html += `<h2 class="h2">Due for review</h2>` + due.map(i=>`<div class="tk"><button class="tkmain" onclick="this.parentNode.classList.toggle('open')"><span class="tkbody"><span class="tktext">${esc(i.title)}</span><span class="tkwhy">${esc(FIELDNAME[i.field]||"")}, stage ${R[i.id].stage+1} of 4</span></span></button><div class="tkmore">${quizHTML(i,"review")}</div></div>`).join("");
+    const earlier = past.filter(i=>i.id!==todayIdea.id).reverse();
+    if(earlier.length) html += `<h2 class="h2">Earlier ideas</h2><div class="tks">${earlier.map(i=>`<div class="tk"><button class="tkmain" onclick="this.parentNode.classList.toggle('open')"><span class="tkbody"><span class="tktext">${esc(i.title)}</span><span class="tkwhy">${esc(FIELDNAME[i.field]||"")}${R[i.id]?(R[i.id].due?`, review ${esc(prettyDay(R[i.id].due))}`:", learned"):", not recalled yet"}</span></span></button><div class="tkmore">${ideaCard(i)}${R[i.id]?"":quizHTML(i,"new")}</div></div>`).join("")}</div>`;
+    const ahead = ideas.filter(i=>i.date>day).length;
+    if(ahead) html += `<p class="hint">${ahead} more idea${ahead>1?"s":""} this week, one a day.</p>`;
+    return html;
+  });
+}
+
 
 // Small Markdown reader for the history files: headings, paragraphs, lists, tables, bold, italic, links.
 function md(src){
@@ -965,7 +1030,7 @@ function route(){
   if(!token() || h==="#settings"){ settingsView(); return syncBar(""); }
   if(h==="#add"){ addView(""); return syncBar("add"); }
   if(h==="#world") return worldView();
-  if(h==="#learn") return comingView("learn","Learn");
+  if(h==="#learn") return learnView();
   if(h==="#life") return lifeView();
   if(h==="#profile") return profileView();
   if(h==="#today/history") return todayHistoryView();
