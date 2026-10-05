@@ -139,7 +139,8 @@ textarea.t{min-height:80px;resize:vertical}
 .sline{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
 .sline b{color:var(--ink);font-size:.95rem}
 .sline .tie{color:var(--emerging)}
-.tktext{font-weight:600;line-height:1.35}
+.tktext{font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tk.open .tktext{display:block}
 .tkwhy{color:var(--muted);font-size:.9rem;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .tk.open .tkwhy{-webkit-line-clamp:unset;display:block}
 .tchips{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 0}
@@ -229,6 +230,22 @@ button.ideas p{font-family:var(--sans);font-size:.98rem}
 .tchip.st-claimed{border-color:var(--disputed);color:var(--disputed)}.tchip.st-trials{border-color:var(--emerging);color:var(--emerging)}.tchip.st-adopted{border-color:var(--established);color:var(--established)}
 .meter{display:inline-flex;gap:2px;vertical-align:middle}.meter i{width:5px;height:9px;border-radius:1px;background:var(--line)}.meter i.on{background:var(--ink)}
 select.t{appearance:auto}
+.horizon p{margin:6px 0 0}
+.k{font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0}
+.hbar{height:8px;border-radius:4px;background:var(--thread-soft);overflow:hidden;margin-top:8px}
+.hbar span{display:block;height:100%;background:var(--thread)}
+.sl{display:grid;grid-template-columns:26px 70px 1fr 40px;gap:8px;align-items:center;margin-top:10px;font-size:.92rem}
+.sl input{width:100%;accent-color:var(--thread)}
+.sl b{text-align:right;font-size:.88rem}
+.cmp{display:grid;grid-template-columns:26px 1fr 38px;gap:8px;align-items:center;margin-top:8px}
+.cmpbars{display:flex;flex-direction:column;gap:3px}
+.cmpbars span{display:block;height:7px;border-radius:4px;min-width:2px}
+.cmpbars .want,.sw.want{background:var(--line)}
+.did.health,.fill.health{background:var(--established)}.did.family,.fill.family{background:var(--experience)}.did.wealth,.fill.wealth{background:var(--emerging)}.did.growth,.fill.growth{background:var(--thread)}.did.meaning,.fill.meaning{background:var(--opinion)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 4px 0 8px;vertical-align:middle}.sw:first-child{margin-left:0}.sw.did{background:var(--ink)}
+.cmpn{font-size:.8rem;color:var(--muted);text-align:right}
+.claimp{margin:10px 0 6px;font-size:.93rem}
+.tktext .ev{display:inline-flex;vertical-align:middle}
 a{color:var(--thread)}
 @media (prefers-reduced-motion: no-preference){.toast{animation:rise .25s ease-out}@keyframes rise{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}}
 </style>
@@ -829,6 +846,77 @@ function profileView(){
   });
 }
 
+// ---------------------------------------------------------------- Life
+
+const HORIZON_AGE = 85;
+function ageMid(r){ const m = String(r||"").match(/(\d+)\D+(\d+)/); if(m) return (+m[1] + +m[2]) / 2; const o = String(r||"").match(/(\d+)/); return o ? +o[1] + 3 : null; }
+function horizonHTML(p){
+  const a = ageMid(p.age_range);
+  if(!a) return askOnce(["age_range"], "Life shows your time horizon from it.");
+  const years = Math.max(0, Math.round(HORIZON_AGE - a)), pct = Math.min(100, Math.round(a / HORIZON_AGE * 100));
+  return `<section class="block horizon"><p class="k">Your horizon</p>
+    <div class="hbar" aria-hidden="true"><span style="width:${pct}%"></span></div>
+    <p>Planning to age ${HORIZON_AGE}, about <b>${years} years</b> are ahead, roughly ${(years*52).toLocaleString()} weeks. A planning horizon, not a forecast.</p></section>`;
+}
+function weights(p){ const w = p.weights || {}; return Object.fromEntries(AREAS.map(([k])=>[k, Number.isFinite(+w[k]) ? +w[k] : 20])); }
+function share(obj){ const t = Object.values(obj).reduce((a,b)=>a+b,0); return Object.fromEntries(Object.entries(obj).map(([k,v])=>[k, t ? Math.round(v*100/t) : 0])); }
+function weekCheckHTML(p, log){
+  const since = addDays(isoDay(), -6), done = Object.fromEntries(AREAS.map(([k])=>[k,0]));
+  log.filter(e=>e.date>=since && done[e.area]!=null).forEach(e=>done[e.area]++);
+  const total = Object.values(done).reduce((a,b)=>a+b,0);
+  const want = share(weights(p)), did = share(done);
+  const gaps = AREAS.map(([k,n])=>({k,n,gap: did[k]-want[k]})).sort((a,b)=>a.gap-b.gap);
+  const note = !total ? "No moves ticked in the last 7 days yet." :
+    `${gaps[gaps.length-1].n} got the most time; ${gaps[0].n.toLowerCase()} got the least compared with its weight.`;
+  return `<section class="block"><div class="h2row"><p class="k">Last 7 days against your weights</p></div>
+    ${AREAS.map(([k,n])=>`<div class="cmp">${areaIcon(k)}<span class="cmpbars"><span class="want" style="width:${want[k]}%"></span><span class="did ${k}" style="width:${did[k]}%"></span></span><span class="cmpn">${did[k]}%</span></div>`).join("")}
+    <p class="hint" style="margin:8px 0 0"><span class="sw want"></span>Weight <span class="sw did"></span>Done, from ${total} tick${total===1?"":"s"}. ${esc(note)}</p></section>`;
+}
+function slidersHTML(p){
+  const w = weights(p), pc = share(w);
+  return `<section class="block"><div class="h2row"><p class="k">Your portfolio</p><button class="iconbtn" id="saveweights" hidden onclick="saveWeights()">Save</button></div>
+    ${AREAS.map(([k,n])=>`<label class="sl">${areaIcon(k)}<span class="sln">${n}</span><input type="range" min="0" max="100" step="5" value="${w[k]}" data-area="${k}" oninput="weightsChanged()"><b id="pc-${k}">${pc[k]}%</b></label>`).join("")}</section>`;
+}
+function weightsChanged(){
+  const w = {}; document.querySelectorAll(".sl input").forEach(i=>w[i.dataset.area]=+i.value);
+  const pc = share(w); Object.entries(pc).forEach(([k,v])=>document.getElementById("pc-"+k).textContent=v+"%");
+  document.getElementById("saveweights").hidden = false;
+}
+async function saveWeights(){
+  const w = {}; document.querySelectorAll(".sl input").forEach(i=>w[i.dataset.area]=+i.value);
+  const b = document.getElementById("saveweights"); b.disabled = true; b.textContent = "Saving";
+  try{ state.v2.profile = await updateFile("profile.json", d=>({...(d||{}), weights:w, updated_at:new Date().toISOString()}), "Update portfolio weights"); toast("Weights saved. Next week's moves follow them."); route(); }
+  catch(e){ toast(e.message); b.disabled=false; b.textContent="Save"; }
+}
+function evidenceCard(c){
+  return `<div class="tk"><button class="tkmain" onclick="this.parentNode.classList.toggle('open')"><span class="tkbody">
+    <span class="tktext"><span class="ev ${esc(c.label)}"></span> ${esc(c.title)}</span><span class="tkwhy">${esc(c.line)}</span></span></button>
+    <div class="tkmore"><p class="claimp">${esc(c.detail)}</p><p class="hint">${esc(EVNAME[c.label]||c.label)}</p>
+    ${(c.sources||[]).map(s=>`<p class="hint"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></p>`).join("")}</div></div>`;
+}
+function bigMoveRow(m, p){
+  const rg = m.range || [m.score,m.score], r = m.ratings||{};
+  return `<div class="tk"><button class="tkmain" onclick="this.parentNode.classList.toggle('open')">${areaIcon(m.area)}<span class="tkbody">
+    <span class="sbar"><span class="rg" style="left:${rg[0]}%;width:${Math.max(1,rg[1]-rg[0])}%"></span><span class="fill ${esc(m.area)}" style="width:${m.score}%"></span></span>
+    <span class="sline"><b>${m.score}</b><small>range ${rg[0]} to ${rg[1]}</small><small>${esc(AREANAME[m.area]||"")} weight ${share(weights(p))[m.area]}%</small></span>
+    <span class="tktext">${esc(m.text)}</span></span></button>
+    <div class="tkmore"><p class="claimp">${esc(m.why)}</p>
+    <div class="ings">${[["I","Impact"],["E","Evidence"],["B","Breadth"],["C","Cost"],["R","Risk"]].map(([k,n])=>`<span><small>${n}</small><b>${r[k]||"?"}</b>/5</span>`).join("")}</div>
+    <p class="hint">Based on: ${(m.support||[]).map(s=>esc(s.title)).join("; ")||"ledger claims"}</p></div></div>`;
+}
+function lifeView(){
+  return v2Page("life", async ()=>{
+    const v = state.v2;
+    if(!v.life) v.life = await ghJSON("life/portfolio.json").catch(()=>null);
+    const L = v.life || {};
+    let html = `<h1 class="ctitle">Life</h1>` + horizonHTML(v.profile) + slidersHTML(v.profile) + weekCheckHTML(v.profile, v.log);
+    html += `<h2 class="h2">Big Moves</h2>` + ((L.big_moves||[]).length ? `<div class="tks">${L.big_moves.map(m=>bigMoveRow(m, v.profile)).join("")}</div>`
+      : `<div class="empty"><p class="hint" style="margin:0">Big Moves arrive with the weekly run.</p></div>`);
+    if((L.evidence||[]).length) html += `<h2 class="h2">What the evidence says</h2><div class="tks">${L.evidence.map(evidenceCard).join("")}</div>`;
+    return html;
+  });
+}
+
 function comingView(tab, name){
   return v2Page(tab, async ()=>`<h1 class="ctitle">${name}</h1><div class="empty"><p class="hint" style="margin:0">Arrives in the next update.</p></div>`);
 }
@@ -878,7 +966,7 @@ function route(){
   if(h==="#add"){ addView(""); return syncBar("add"); }
   if(h==="#world") return worldView();
   if(h==="#learn") return comingView("learn","Learn");
-  if(h==="#life") return comingView("life","Life");
+  if(h==="#life") return lifeView();
   if(h==="#profile") return profileView();
   if(h==="#today/history") return todayHistoryView();
   if(h==="#library") return libraryView();
