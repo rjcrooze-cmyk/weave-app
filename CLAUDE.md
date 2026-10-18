@@ -1,75 +1,31 @@
-# Weave: briefing for Claude Code
+# Curious Much?: briefing for Claude
 
-**Read SPEC.md first.** It is the product definition: card format, repeat detection, the weekly
-Leverage Score and Top 10s, and the layout. Build toward it.
+Rohit's question bank. One job: capture every question or debatable point that comes to his mind,
+with the time, so nothing is lost. Answering them comes later and is not built yet.
 
-Weave is Rohit's personal research app. He shares a YouTube video from his Android phone into a
-category, and gets back a card that replaces watching it: an ELI5, every critical point by section
-with evidence labels and timestamps, and how the video changes his research map.
+## Repos
 
-## The two repos
+- **weave-app** (this repo, public, GitHub Pages at rjcrooze-cmyk.github.io/weave-app): the phone app.
+  One self-contained `index.html`, `manifest.webmanifest`, `sw.js`, icons. No build step, no secrets.
+  `ask/` only redirects to the root (the app lived there briefly).
+- **weave-vault** (private): the data. Each question is one file,
+  `questions/YYYY-MM/<YYYY-MM-DD-HHMMSS>-<rand>.json` with `{text, asked_at, how}`.
+  `asked_at` is local time with offset (IST). `how` is `voice` or `typed`.
 
-- **weave-app** (this repo, public, served by GitHub Pages at rjcrooze-cmyk.github.io/weave-app):
-  the phone app. One self-contained `index.html` (HTML, CSS, JS inline), `manifest.webmanifest`
-  (includes the Android share target), `sw.js`, icons. No build step, no framework, no secrets.
-  The app talks to the GitHub API with a fine-grained token stored on the phone (localStorage).
-- **weave-vault** (private): the data and the processor.
-  - `inbox/`: items saved by the app (`{url, category, note, added_at}`)
-  - `process.py prepare`: GitHub Action on push to `inbox/`. Fetches captions from TranscriptAPI,
-    splits into ~10 minute sections, writes `work/<item>/task.json`, then POSTs to the Claude routine.
-  - The **Claude Code routine "Weave processor"** (Opus 5.5) follows the vault's `CLAUDE.md`,
-    writes `work/<item>/ai.json`, then runs `process.py finalize`.
-  - `process.py finalize`: checks every quote against the transcript with plain code, drops points
-    whose quote is not really there, writes `cards/<id>.json` and `cards/index.json`, appends
-    new claims to `ledger/<category>.jsonl`.
-  - `SYNTHESIS.md` + `process.py synth-prep|synthesize`: the weekly routine. The AI rates I, E, B, C, R
-    with cited claim ids; code computes the Leverage Score and writes `takeaways/<category>.json`,
-    `takeaways/life-top10.json` (the Life Top 10; `life.json` is the Life and Joy category) and
-    `takeaways/changes.json`. Ledger claims have stable `id`s.
-  - `weekly.py`: the Version 2 parts of the weekly run (Today moves, World timeline, Life portfolio,
-    Learn ideas), checked by code and written to `today/`, `world/`, `life/` and `learn/`.
-  - `profile.json`: Rohit's private profile, edited from the app's Profile screen.
-  - `categories.json`: five categories, guiding questions, and the 18 sub-questions (Q1 to Q18)
-    for Mind, Consciousness and Reality. `failed/` holds items that failed, with the reason.
-  - Secrets: `TRANSCRIPT_API_KEY`, `ROUTINE_FIRE_URL`, `ROUTINE_TOKEN`.
+The old Weave research app (cards, ledger, synthesis) is on the `weave-backup` branch of both repos.
 
-## Principles (do not break)
+## How the app works
 
-- The card must not lose important content. No fixed point counts, no pre-summarising transcripts.
-- Accuracy is enforced by code, not by trusting the AI: every point needs an exact transcript quote.
-- Evidence labels: established, emerging, disputed, opinion, experience. Judge claims, not confidence.
-- Keep it simple: one structure for all categories, different views on top. Small fixed AI jobs.
-- Rohit pays only his existing subscriptions. Do not add paid services or API keys.
+- Opens and starts listening (Android Chrome speech recognition, `en-IN`). The engine stops on
+  every pause, so the app restarts it and keeps adding text. Only Stop (or leaving the app, or a
+  5 minute safety cap) ends a question.
+- Saves to the vault with the GitHub contents API using a fine-grained key stored on the phone
+  (localStorage `weave.token`). Unsent questions queue on the phone and send when online.
+
+## Rules
+
+- Keep it simple. Plain, sentence-case copy. No em dashes in anything Rohit reads.
+- `gh(path)` must never add a trailing slash (a redirect shows up as "Failed to fetch").
 - Never put secrets in this public repo.
-
-## App conventions
-
-- Colours are CSS variables on `:root`, with a dark mode block. Evidence colours: established green,
-  emerging amber, disputed red, opinion violet, experience teal. Fonts: Instrument Sans (UI),
-  Source Serif 4 (reading text).
-- Plain, active, sentence-case copy. No em dashes in any text Rohit reads.
-- `gh(path)` builds `https://api.github.com/repos/<repo>/<path>`. Never add a trailing slash:
-  a redirect on these requests shows up as "Failed to fetch".
-- Routes (Version 2): bottom bar `#` Today, `#world`, `#add`, `#learn`, `#life`; Menu has `#library`
-  (Life Top 10, category grid, latest cards), `#profile` and `#settings`. Also `#today/history`, `#cats`,
-  `#cat/<key>/<top|map|sources|history>`, `#card/<id>`, `#changes`, `#history/<key>`.
-- The app writes three vault files through `updateFile()` (read with sha, write, retry once):
-  `profile.json`, `app/today-log.json` and `app/reviews.json`. Everything else is written by the vault.
-- Changes must keep working on Android Chrome as an installed app. The service worker is
-  network-first; tell Rohit to fully close and reopen the app after a change.
-
-## Working efficiently
-
-Rohit brings batches of small improvements. Keep sessions cheap:
-- Read only the files the change needs. `index.html` is large; edit it in place, do not rewrite it.
-- Make the change, check JS syntax, commit with a clear message, and list what changed in plain words.
-- When a change is done and checked, merge it into `main` (and delete any side branch). Rohit's phone loads `main`, so
-  work left on a side branch never reaches him. This applies to weave-vault too.
-- Ask one question only when a request is genuinely ambiguous.
-
-## Planned, not built yet
-
-Outcome summary view per category with sub-question progress, PDFs and articles, importing past
-ChatGPT and Claude research as "prior research, unverified", a daily tracker of new studies with
-strict filtering, a weekly review by a second model, the other four categories' sub-questions,
-and a connector so Claude and ChatGPT can read and add to the vault.
+- Merge finished changes into `main`; the phone loads `main`. After a change, tell Rohit to fully
+  close and reopen the app.

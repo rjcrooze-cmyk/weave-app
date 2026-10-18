@@ -2,1062 +2,343 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1D2531">
-<title>Weave</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Curious Much?</title>
+<meta name="theme-color" content="#1B2340">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500&display=swap">
 <style>
+/* One screen: a listening lamp in the middle, the question under it, recent questions at the foot. */
 :root{
-  --bg:#E9EDF2; --surface:#F7F9FB; --ink:#1D2531; --muted:#5B6676; --line:#CFD6DF;
-  --thread:#2F5D8A; --thread-soft:#DCE6F0;
-  --established:#2E7D5B; --emerging:#B7791F; --disputed:#B4343F; --opinion:#6A4C9C; --experience:#23798E;
-  --sans:"Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
-  box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#EEF0F6; --surface:#FFFFFF; --ink:#1B2340; --muted:#5E6684; --line:#D6DAE6;
+  --lamp:#E07A2E; --lamp-soft:rgba(224,122,46,.16); --ok:#2E7D5B; --warn:#B0412E;
+  --ui:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --read:"Newsreader",Georgia,"Times New Roman",serif;
+  color-scheme:light;
 }
-@media (prefers-color-scheme: dark){
-  :root{--bg:#141A22; --surface:#1C2430; --ink:#E6EAF0; --muted:#9AA6B6; --line:#2E3949;
-    --thread:#7FA8D1; --thread-soft:#233246;
-    --established:#5DBB8F; --emerging:#E0A84A; --disputed:#E06C76; --opinion:#A98BD9; --experience:#5BB6C8;}
-}
-*,*::before,*::after{box-sizing:inherit}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45}
-button,input,textarea,select{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--thread);outline-offset:2px}
-.wrap{max-width:640px;margin:0 auto;padding:16px}
-header.top{display:flex;align-items:center;justify-content:space-between;padding:8px 0 16px}
-.brand{font-family:var(--serif);font-size:1.6rem;font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
-.brand svg{width:28px;height:28px}
-.iconbtn{background:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;color:var(--muted)}
-.primary{background:var(--thread);color:#fff;border:0;border-radius:12px;padding:14px 18px;font-weight:600;width:100%;cursor:pointer}
-@media (prefers-color-scheme: dark){.primary{color:#0F1620}}
-.primary[disabled]{opacity:.5}
-.chips{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:4px}
-.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;cursor:pointer;font-size:.92rem;white-space:nowrap}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-label.f{display:block;font-weight:600;margin:18px 0 6px}
-.hint{color:var(--muted);font-size:.9rem;margin:4px 0 0}
-input.t,textarea.t{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px}
-textarea.t{min-height:80px;resize:vertical}
-.list{display:flex;flex-direction:column;gap:2px;margin-top:16px}
-.row{background:var(--surface);padding:14px 16px;cursor:pointer;border:0;text-align:left;width:100%;display:block}
-.row:first-child{border-radius:14px 14px 4px 4px}.row:last-child{border-radius:4px 4px 14px 14px}.row:only-child{border-radius:14px}
-.row h3{margin:0 0 4px;font-size:1rem;font-weight:600}
-.row p{margin:0;color:var(--muted);font-size:.92rem}
-.meta{display:flex;flex-wrap:wrap;gap:10px;color:var(--muted);font-size:.85rem;margin-top:6px;align-items:center}
-.pending{border-left:3px solid var(--thread)}
-.failed{border-left:3px solid var(--disputed)}
-.sectionhead{font-weight:600;color:var(--muted);font-size:.9rem;margin:24px 0 0}
-.empty{background:var(--surface);border-radius:14px;padding:22px;margin-top:16px}
-.empty h2{font-family:var(--serif);margin:0 0 6px;font-size:1.25rem}
-.dots{display:inline-flex;gap:3px;vertical-align:middle}
-.dots i{width:7px;height:7px;border-radius:50%;background:var(--line);display:block}
-.dots i.on{background:var(--ink)}
-.card h1{font-family:var(--serif);font-size:1.55rem;line-height:1.2;margin:4px 0 6px;font-weight:600}
-.saved{display:flex;gap:16px;align-items:baseline;margin:10px 0 2px;flex-wrap:wrap}
-.saved b{font-family:var(--serif);font-size:1.9rem;font-weight:600}
-.block{background:var(--surface);border-radius:14px;padding:16px;margin-top:14px}
-.block h2{margin:0 0 8px;font-size:.95rem;color:var(--muted);font-weight:600}
-.eli5{font-family:var(--serif);font-size:1.12rem;line-height:1.55;margin:0}
-.map{display:flex;flex-direction:column;gap:8px}
-.mapitem{display:flex;gap:10px;align-items:flex-start}
-.badge{flex:none;font-size:.78rem;font-weight:600;border-radius:6px;padding:2px 7px;background:var(--thread-soft);color:var(--thread)}
-.badge.contradicts{background:var(--disputed);color:#fff}
-.alert{border:2px solid var(--disputed)}
-.thread{display:flex;gap:4px;margin:8px 0 2px}
-.thread span{flex:1;height:10px;border-radius:5px;background:var(--line)}
-.thread span.d1{background:var(--thread-soft)} .thread span.d2{background:var(--thread)} .thread span.d3{background:var(--ink)}
-.sec{margin-top:22px}
-.sec h3{display:flex;justify-content:space-between;gap:10px;margin:0 0 6px;font-size:1rem}
-.sec h3 small{color:var(--muted);font-weight:400;white-space:nowrap}
-.pt{display:grid;grid-template-columns:30px 1fr;gap:4px 10px;padding:12px 0;border-top:1px solid var(--line)}
-.pt .imp{padding-top:4px}
-.pt p{margin:0}
-.pt .tags{display:flex;gap:10px;flex-wrap:wrap;font-size:.85rem;margin-top:4px;align-items:center}
-.ev{display:inline-flex;align-items:center;gap:5px}
-.ev::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}
-.ev.established{color:var(--established)}.ev.emerging{color:var(--emerging)}.ev.disputed{color:var(--disputed)}.ev.opinion{color:var(--opinion)}.ev.experience{color:var(--experience)}
-.ts{color:var(--thread);text-decoration:none;font-weight:600}
-.useit{grid-column:2;background:var(--thread-soft);border-radius:8px;padding:8px 10px;font-size:.93rem;margin-top:6px}
-.skip{color:var(--muted);font-style:italic;margin:4px 0 0}
-.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.82rem;margin-top:8px}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:12px;max-width:90%;z-index:10}
-.err{color:var(--disputed);margin-top:10px}
-.doc h2{font-family:var(--serif);font-size:1.25rem;line-height:1.25;margin:30px 0 8px;font-weight:600}
-.doc h3{font-size:1rem;margin:20px 0 6px}
-.doc p,.doc li{font-family:var(--serif);font-size:1.06rem;line-height:1.55}
-.doc p{margin:0 0 12px}
-.doc ul,.doc ol{margin:0 0 12px;padding-left:1.4em}
-.doc li{margin-bottom:6px}
-.trow{background:var(--surface);border-radius:12px;padding:12px 14px;margin:8px 0}
-.trow p{margin:6px 0 0;font-size:.98rem}
-.trow p:first-child{margin-top:0;font-weight:600}
-.trow .k{display:block;font-family:var(--sans);font-weight:600;font-size:.8rem;color:var(--muted)}
-.wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
-.bar{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;justify-content:space-around;align-items:center;gap:8px;
-  background:var(--surface);border-top:1px solid var(--line);padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px))}
-.bar[hidden]{display:none}
-.bar button{flex:1;max-width:140px;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.78rem;color:var(--muted);padding:4px 0;cursor:pointer}
-.bar button svg{width:22px;height:22px}
-.bar button[aria-current="page"]{color:var(--ink);font-weight:600}
-.bar .addbtn{flex:none;width:auto;flex-direction:row;gap:6px;background:var(--thread);color:#fff;border-radius:999px;padding:11px 22px;font-size:.95rem;font-weight:600}
-.bar .addbtn[aria-current="page"]{color:#fff}
-@media (prefers-color-scheme: dark){.bar .addbtn,.bar .addbtn[aria-current="page"]{color:#0F1620}}
-.h2row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
-.h2{font-family:var(--serif);font-size:1.3rem;font-weight:600;margin:26px 0 6px}
-.h2row .h2{margin-bottom:6px}
-.small{font-size:.88rem;white-space:nowrap}
-.sub0{margin:0 0 8px}
-.ctitle{font-family:var(--serif);font-size:1.45rem;line-height:1.2;margin:2px 0 12px;font-weight:600}
-.gq{font-family:var(--serif);font-size:1.02rem;color:var(--muted);margin:14px 0 6px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tile{background:var(--surface);border:0;border-radius:14px;padding:12px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px;min-width:0}
-.tname{font-weight:600;font-size:.95rem;line-height:1.25}
-.ttop{font-family:var(--serif);font-size:.92rem;line-height:1.35;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;flex:1}
-.ttop i{color:var(--muted)}
-.pbar{display:flex;gap:2px;height:6px;border-radius:3px;overflow:hidden}
-.pbar span{display:block}.pbar .a{background:var(--established)}.pbar .p{background:var(--emerging)}.pbar .c{background:var(--disputed)}.pbar .o{background:var(--line)}
-.prog{margin:0;color:var(--muted);font-size:.78rem;line-height:1.3}
-.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--surface);border-radius:12px;padding:4px;position:sticky;top:0;z-index:2}
-.tabs button{border:0;background:none;border-radius:9px;padding:8px 2px;font-size:.88rem;cursor:pointer;color:var(--muted)}
-.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);font-weight:600}
-.tks{display:flex;flex-direction:column;gap:6px}
-.tk{background:var(--surface);border-radius:14px}
-.tkmain,.qrow{display:flex;gap:12px;width:100%;background:none;border:0;text-align:left;padding:12px 14px;cursor:pointer;align-items:flex-start}
-.rank,.qid{flex:none;font-family:var(--serif);font-weight:600;font-size:1.25rem;min-width:24px;text-align:center;line-height:1.2}
-.qid{font-family:var(--sans);font-size:.85rem;color:var(--thread);padding-top:2px;min-width:30px}
-.tkbody{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
-.sbar{position:relative;display:block;height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:6px}
-.sbar .rg{position:absolute;top:0;bottom:0;background:var(--thread-soft)}
-.sbar .fill{position:absolute;left:0;top:2px;bottom:2px;border-radius:3px;background:var(--thread)}
-.sline{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
-.sline b{color:var(--ink);font-size:.95rem}
-.sline .tie{color:var(--emerging)}
-.tktext{font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.tk.open .tktext{display:block}
-.tkwhy{color:var(--muted);font-size:.9rem;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.tk.open .tkwhy{-webkit-line-clamp:unset;display:block}
-.tchips{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 0}
-.tchip{font-size:.74rem;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--muted);white-space:nowrap}
-.tchip.lv{border-color:var(--thread);color:var(--thread)}
-.tchip.ph{border-color:var(--opinion);color:var(--opinion);white-space:normal}
-.tchip.lead{border-color:var(--emerging);color:var(--emerging)}
-.tchip.st-partial{border-color:var(--emerging);color:var(--emerging)}.tchip.st-contested{border-color:var(--disputed);color:var(--disputed)}.tchip.st-answered{border-color:var(--established);color:var(--established)}
-.tkmore{display:none;padding:0 14px 14px;border-top:1px solid var(--line)}
-.tk.open .tkmore{display:block}
-.kind{font-weight:600;font-size:.85rem;color:var(--muted);margin:10px 0 6px}
-.ings{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;text-align:center}
-.ings span{background:var(--bg);border-radius:8px;padding:6px 2px;font-size:.8rem;color:var(--muted)}
-.ings small{display:block;font-size:.7rem}.ings b{color:var(--ink);font-size:1rem}
-.sub{font-weight:600;font-size:.85rem;color:var(--muted);margin:14px 0 4px}
-.claim{display:grid;grid-template-columns:12px 1fr;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
-.claim .ev{padding-top:6px}
-.claim p{margin:0;font-size:.93rem}.claim p.hint{font-size:.8rem;margin-top:2px}
-.drop{display:flex;align-items:center;gap:8px;color:var(--disputed);font-size:.8rem;font-weight:600;margin:4px 2px}
-.drop::before,.drop::after{content:"";flex:1;border-top:2px dashed var(--disputed)}
-.card h1 .mins{font-family:var(--sans);font-size:1rem;color:var(--muted);font-weight:400;white-space:nowrap}
-.short{display:flex;flex-direction:column;gap:14px}
-.kv{display:block}
-.kv .k{display:block;font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
-.kv p{margin:0;font-family:var(--serif);font-size:1.08rem;line-height:1.5}
-.kv p.tchips{font-family:var(--sans);margin-top:6px}
-.kv .left{font-weight:600}
-button.ideas{background:var(--thread-soft);border:0;border-radius:10px;padding:10px 12px;text-align:left;cursor:pointer;width:100%}
-button.ideas p{font-family:var(--sans);font-size:.98rem}
-.ideaslist .sub:first-child{margin-top:0}
-.detailsbtn{display:block;width:100%;margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;font-weight:600;cursor:pointer}
-.bar svg,.ai{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.bar .addbtn{width:56px;height:56px;padding:0;justify-content:center;border-radius:50%;margin-top:-22px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
-.bar .addbtn svg{width:26px;height:26px;stroke-width:2.6}
-.ai{flex:none;width:26px;height:26px;padding:3px;border-radius:8px}
-.ai.health{color:var(--established);background:color-mix(in srgb,var(--established) 14%,transparent)}
-.ai.family{color:var(--experience);background:color-mix(in srgb,var(--experience) 14%,transparent)}
-.ai.wealth{color:var(--emerging);background:color-mix(in srgb,var(--emerging) 14%,transparent)}
-.ai.growth{color:var(--thread);background:color-mix(in srgb,var(--thread) 14%,transparent)}
-.ai.meaning{color:var(--opinion);background:color-mix(in srgb,var(--opinion) 14%,transparent)}
-.menu{position:fixed;top:calc(64px + env(safe-area-inset-top,0px));right:max(16px,calc(50% - 304px));z-index:20;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;min-width:240px;overflow:hidden}
-.menu button{background:none;border:0;text-align:left;padding:12px 16px;cursor:pointer;display:flex;flex-direction:column;border-top:1px solid var(--line)}
-.menu button:first-child{border-top:0}
-.menu span{color:var(--muted);font-size:.82rem}
-.ask{background:var(--thread-soft);border-radius:14px;padding:12px 14px;margin:12px 0}
-.ask p{margin:0 0 10px;font-size:.93rem}
-.askbtns{display:flex;gap:10px;align-items:center}
-.primary.sm{width:auto;padding:8px 14px;border-radius:10px;font-size:.92rem}
-.dayline{font-family:var(--serif);font-size:1.3rem;font-weight:600;margin:0 0 10px}
-.moves{display:flex;flex-direction:column;gap:8px}
-.move{background:var(--surface);border-radius:14px}
-.mvrow{display:flex;align-items:center;gap:4px;padding-right:10px}
-.mvmain{flex:1;display:flex;gap:12px;align-items:flex-start;background:none;border:0;text-align:left;padding:14px 4px 14px 14px;cursor:pointer;min-width:0}
-.mvtext{display:flex;flex-direction:column;gap:3px;min-width:0}
-.mvaction{font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.move.open .mvaction{display:block}
-.mvmeta{color:var(--muted);font-size:.84rem}
-.move.done .mvaction{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
-.tick{flex:none;width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:none;cursor:pointer;display:grid;place-items:center;padding:0}
-.tick svg{width:22px;height:22px;fill:none;stroke:transparent;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
-.tick[aria-pressed="true"]{background:var(--established);border-color:var(--established)}
-.tick[aria-pressed="true"] svg{stroke:#fff}
-.mvmore,.wdetail{display:none;padding:0 14px 14px 52px}
-.move.open .mvmore{display:block}
-.mvmore p,.wdetail p{margin:8px 0 0;font-size:.93rem}
-.mvmore .k,.wdetail .k{display:block;font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
-.hrow{display:flex;gap:10px;align-items:center;cursor:default}
-.hrow p{color:var(--ink)}
-.wgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-.whead{position:sticky;top:0;z-index:2;background:var(--bg);padding:6px 0;border-bottom:2px solid var(--line);margin-top:8px}
-.whead span{font-size:.8rem;font-weight:600;color:var(--muted);text-align:center}
-.lane{margin-top:14px;position:relative}
-.lanename{font-weight:600;font-size:.85rem;margin:0 0 6px;color:var(--muted)}
-.wcell{display:flex;flex-direction:column;gap:6px;min-width:0;border-left:1px dashed var(--line);padding-left:4px;min-height:24px}
-.wd{background:var(--surface);border:0;border-radius:10px;padding:6px 5px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:4px;min-width:0}
-.wt{font-size:.74rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;hyphens:auto;overflow-wrap:break-word}
-.dot{display:inline-block;border-radius:50%;border:2px solid var(--thread);flex:none;vertical-align:middle}
-.dot.lk-low{width:10px;height:10px}.dot.lk-medium{width:14px;height:14px}.dot.lk-high{width:18px;height:18px}
-.dot.st-adopted{background:var(--thread)}
-.dot.st-trials{background:linear-gradient(90deg,var(--thread) 50%,transparent 50%)}
-.dot.st-claimed{background:transparent;border-style:dashed}
-.legend.wl{align-items:center;color:var(--muted)}
-.legend.wl>span{display:inline-flex;gap:6px;align-items:center}
-.wdetail{display:block;background:var(--surface);border-radius:14px;margin-top:8px;padding:12px 14px;position:relative}
-.wdh{font-weight:600;font-size:1rem;margin:0 70px 6px 0 !important}
-.wdetail .close{position:absolute;top:10px;right:10px;padding:4px 10px;font-size:.82rem}
-.tchip.st-claimed{border-color:var(--disputed);color:var(--disputed)}.tchip.st-trials{border-color:var(--emerging);color:var(--emerging)}.tchip.st-adopted{border-color:var(--established);color:var(--established)}
-.meter{display:inline-flex;gap:2px;vertical-align:middle}.meter i{width:5px;height:9px;border-radius:1px;background:var(--line)}.meter i.on{background:var(--ink)}
-select.t{appearance:auto}
-.horizon p{margin:6px 0 0}
-.k{font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0}
-.hbar{height:8px;border-radius:4px;background:var(--thread-soft);overflow:hidden;margin-top:8px}
-.hbar span{display:block;height:100%;background:var(--thread)}
-.sl{display:grid;grid-template-columns:26px 70px 1fr 40px;gap:8px;align-items:center;margin-top:10px;font-size:.92rem}
-.sl input{width:100%;accent-color:var(--thread)}
-.sl b{text-align:right;font-size:.88rem}
-.cmp{display:grid;grid-template-columns:26px 1fr 38px;gap:8px;align-items:center;margin-top:8px}
-.cmpbars{display:flex;flex-direction:column;gap:3px}
-.cmpbars span{display:block;height:7px;border-radius:4px;min-width:2px}
-.cmpbars .want,.sw.want{background:var(--line)}
-.did.health,.fill.health{background:var(--established)}.did.family,.fill.family{background:var(--experience)}.did.wealth,.fill.wealth{background:var(--emerging)}.did.growth,.fill.growth{background:var(--thread)}.did.meaning,.fill.meaning{background:var(--opinion)}
-.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 4px 0 8px;vertical-align:middle}.sw:first-child{margin-left:0}.sw.did{background:var(--ink)}
-.cmpn{font-size:.8rem;color:var(--muted);text-align:right}
-.claimp{margin:10px 0 6px;font-size:.93rem}
-.tktext .ev{display:inline-flex;vertical-align:middle}
-.idea{background:var(--surface);border-radius:14px;padding:16px}
-.ititle{font-family:var(--serif);font-size:1.35rem;line-height:1.25;margin:8px 0 6px}
-.ibody{font-family:var(--serif);font-size:1.08rem;line-height:1.55;margin:0}
-.iapp{margin:12px 0 0;font-size:.95rem}.iapp .k{display:block}
-.tkmore .idea{padding:12px 0 0}
-.quiz{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-.qa{background:var(--surface);border-radius:12px;padding:12px 14px}
-.tkmore .qa{background:var(--bg)}
-.q{margin:0 0 8px;font-weight:600}
-.ans p{margin:0 0 10px;font-family:var(--serif)}
-a{color:var(--thread)}
-@media (prefers-reduced-motion: no-preference){.toast{animation:rise .25s ease-out}@keyframes rise{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#141A30; --surface:#1D2440; --ink:#ECEEF6; --muted:#A3AAC4; --line:#2E3657;
+  --lamp:#F0954A; --lamp-soft:rgba(240,149,74,.18); --ok:#5FC497; --warn:#F08A76;
+  color-scheme:dark;
+}}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--ui);
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  -webkit-tap-highlight-color:transparent}
+.wrap{min-height:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:20px;
+  padding-block:18px 24px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-weight:600;letter-spacing:.01em}
+.count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;text-align:center;min-height:52vh}
+.lamp{width:148px;height:148px;border-radius:50%;border:0;background:var(--lamp);color:#fff;cursor:pointer;
+  display:grid;place-items:center;position:relative;box-shadow:0 0 0 0 var(--lamp-soft)}
+.lamp svg{width:46px;height:46px}
+.lamp:focus-visible{outline:3px solid var(--ink);outline-offset:6px}
+.lamp.idle{background:var(--surface);color:var(--lamp);border:2px solid var(--line)}
+.lamp.on{animation:breathe 1.6s ease-in-out infinite}
+.lamp.done{background:var(--ok)}
+@keyframes breathe{0%,100%{box-shadow:0 0 0 0 var(--lamp-soft)}50%{box-shadow:0 0 0 26px var(--lamp-soft)}}
+@media (prefers-reduced-motion:reduce){.lamp.on{animation:none;box-shadow:0 0 0 14px var(--lamp-soft)}}
+.status{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-height:20px}
+.status.ok{color:var(--ok)} .status.warn{color:var(--warn)}
+.q{font:italic 500 clamp(22px,6vw,30px)/1.3 var(--read);max-width:28ch;text-wrap:balance;min-height:1.3em;margin:0;overflow-wrap:anywhere}
+.q.ghost{color:var(--muted);font-weight:400}
+.when{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;min-height:21px}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+button.b{font:600 15px var(--ui);padding:11px 18px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.b.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button.b:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--lamp);outline-offset:2px}
+.link{background:none;border:0;color:var(--muted);font:500 14px var(--ui);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px}
+textarea,input.t{width:100%;font:italic 20px/1.4 var(--read);color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px;resize:vertical}
+input.t{font:15px var(--ui)}
+.typed{width:100%;display:flex;flex-direction:column;gap:12px}
+.recent h2{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.recent ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.recent li{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-top:1px solid var(--line)}
+.recent .txt{font:italic 17px/1.35 var(--read);min-width:0;overflow-wrap:anywhere}
+.recent .t2{font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;padding-top:3px}
+.recent .pend{color:var(--lamp)}
+.setup{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;text-align:left}
+.setup p{margin:0;color:var(--muted);font-size:14px}
+.setup strong{color:var(--ink)}
 </style>
 </head>
 <body>
-<div class="wrap" id="app"></div>
-<nav class="bar" id="bar" hidden>
-  <button data-tab="today" onclick="go('#')"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>Today</button>
-  <button data-tab="world" onclick="go('#world')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M7 12v-3M12 12v-5M17 12v-3"/><circle cx="7" cy="16" r="1.5"/><circle cx="12" cy="17" r="1.5"/><circle cx="17" cy="16" r="1.5"/></svg>World</button>
-  <button data-tab="add" class="addbtn" onclick="go('#add')" aria-label="Add a video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
-  <button data-tab="learn" onclick="go('#learn')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>Learn</button>
-  <button data-tab="life" onclick="go('#life')"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v8l5.5 5.5"/></svg>Life</button>
-</nav>
+<div class="wrap">
+  <header><span class="brand">Curious Much?</span><span class="count" id="count"></span></header>
+  <main id="main"></main>
+  <section class="recent" id="recent" hidden><h2>Recent</h2><ol id="list"></ol></section>
+</div>
 <script>
-const CATS = [
-  ["mind","Mind, Consciousness and Reality"],
-  ["science","AI and Science"],
-  ["money","Business and Money"],
-  ["life","Life and Joy"],
-  ["adhd","ADHD and Mental Health"]
-];
-const CATNAME = Object.fromEntries(CATS);
-const EVNAME = {established:"Established",emerging:"Emerging",disputed:"Disputed",opinion:"Speaker's opinion",experience:"Experience report"};
+"use strict";
 const DEFAULT_REPO = "rjcrooze-cmyk/weave-vault";
-const app = document.getElementById("app");
-const state = {v2:null, cards:[], pending:[], failed:[], histories:[], cats:{}, life:null, tk:{}, ledger:{}, changes:null, loaded:false, poll:null};
+const FOLDER = "questions";
+const LANG = "en-IN";
 
 function store(k,v){try{ if(v===undefined) return localStorage.getItem(k); if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v);}catch(e){return null}}
-const token = () => store("weave.token");
-const repo = () => store("weave.repo") || DEFAULT_REPO;
+const token = () => store("weave.token");          // shared with Weave on this phone
+const repo  = () => store("weave.repo") || DEFAULT_REPO;
+const readList = k => { try{ return JSON.parse(store(k)||"[]"); }catch(e){ return []; } };
+const writeList = (k,a) => store(k, JSON.stringify(a));
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const $ = id => document.getElementById(id);
 
-function toast(msg){
-  document.querySelectorAll(".toast").forEach(t=>t.remove());
-  const t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.textContent=msg;
-  document.body.appendChild(t); setTimeout(()=>t.remove(),4500);
+const MIC = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>`;
+const TICK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+
+// ---------- time ----------
+function isoLocal(d){
+  const p = n => String(Math.abs(n)).padStart(2,"0");
+  const off = -d.getTimezoneOffset();
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}${off>=0?"+":"-"}${p(Math.trunc(off/60))}:${p(off%60)}`;
+}
+function niceTime(iso){
+  const d = new Date(iso), now = new Date();
+  const time = d.toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"});
+  if (d.toDateString()===now.toDateString()) return `Today, ${time}`;
+  const y = new Date(now); y.setDate(now.getDate()-1);
+  if (d.toDateString()===y.toDateString()) return `Yesterday, ${time}`;
+  return d.toLocaleDateString("en-IN",{day:"numeric",month:"short",year: d.getFullYear()===now.getFullYear()?undefined:"numeric"}) + `, ${time}`;
 }
 
+// ---------- GitHub ----------
+function b64(str){ const bytes=new TextEncoder().encode(str); let bin=""; bytes.forEach(b=>bin+=String.fromCharCode(b)); return btoa(bin); }
 async function gh(path, opts={}){
   const res = await fetch(`https://api.github.com/repos/${repo()}${path ? "/" + path : ""}`, {
     cache:"no-store", ...opts,
-    headers:{"Authorization":`Bearer ${token()}`,"Accept":opts.raw?"application/vnd.github.raw+json":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28",...(opts.headers||{})}
+    headers:{"Authorization":`Bearer ${token()}`,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}
   });
-  if(res.status===404) return null;
-  if(res.status===401) throw new Error("The access key was rejected. Check it in Settings.");
-  if(!res.ok) throw new Error(`GitHub said ${res.status}. Try again in a moment.`);
-  return opts.raw ? res.text() : res.json();
-}
-const ghJSON = async p => { const t = await gh(`contents/${p}`, {raw:true}); return t ? JSON.parse(t) : null; };
-function b64(str){ const bytes=new TextEncoder().encode(str); let bin=""; bytes.forEach(b=>bin+=String.fromCharCode(b)); return btoa(bin); }
-
-function findUrl(text){
-  const m = String(text||"").match(/https?:\/\/[^\s]+/); return m ? m[0] : "";
-}
-function isYouTube(u){ return /(youtube\.com|youtu\.be)\//i.test(u); }
-
-const logo = `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 10c6 0 6 12 13 12s7-12 13-12" fill="none" stroke="var(--thread)" stroke-width="3" stroke-linecap="round"/><path d="M3 22c6 0 6-12 13-12s7 12 13 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`;
-function header(right){ return `<header class="top"><div class="brand">${logo}<span>Weave</span></div>${right||""}</header>`; }
-function dots(n){ return `<span class="dots" aria-label="Importance ${n} of 3">${[1,2,3].map(i=>`<i class="${i<=n?"on":""}"></i>`).join("")}</span>`; }
-function attentionLabel(n){ return ["","Low","Medium","High"][n]||""; }
-function when(iso){ try{ return new Date(iso).toLocaleDateString(undefined,{day:"numeric",month:"short"}); }catch(e){return ""} }
-
-function settingsView(msg){
-  app.innerHTML = header(token()?`<button class="iconbtn" onclick="go('#')">Done</button>`:"") + `
-  <div class="empty"><h2>Connect your vault</h2>
-  <p class="hint" style="margin:0">Weave saves everything to your private GitHub repository. Paste the access key you created for it. It stays on this phone only.</p></div>
-  <label class="f" for="tok">Access key</label>
-  <input class="t" id="tok" type="password" autocomplete="off" placeholder="github_pat_..." value="${esc(token()||"")}">
-  <label class="f" for="rep">Vault repository</label>
-  <input class="t" id="rep" type="text" autocomplete="off" value="${esc(repo())}">
-  <p class="hint">Owner and name, like ${esc(DEFAULT_REPO)}</p>
-  <div style="margin-top:22px"><button class="primary" id="savekey">Save and check</button></div>
-  <p class="err" id="err">${esc(msg||"")}</p>`;
-  document.getElementById("savekey").onclick = async ()=>{
-    const t=document.getElementById("tok").value.replace(/[^\x21-\x7E]/g,""), r=document.getElementById("rep").value.trim();
-    if(!t){ document.getElementById("err").textContent="Paste the access key first."; return; }
-    store("weave.token",t); store("weave.repo",r||DEFAULT_REPO);
-    try{ const info = await gh(""); if(!info) throw new Error("That repository was not found, or the key cannot see it."); toast("Connected"); const pend=store("weave.pendingshare"); if(pend){ store("weave.pendingshare",null); history.replaceState(null,"",location.pathname); return addView(pend);} history.replaceState(null,"",location.pathname); go("#"); }
-    catch(e){ document.getElementById("err").textContent=e.message; }
-  };
+  if(res.status===401) throw new Error("key");
+  if(!res.ok) throw new Error(String(res.status));
+  return res.json();
 }
 
-function addView(prefill){
-  let cat = store("weave.lastcat") || "mind";
-  app.innerHTML = header(`<button class="iconbtn" onclick="back()">Cancel</button>`) + `
-  <label class="f" for="url">YouTube link</label>
-  <input class="t" id="url" type="url" inputmode="url" placeholder="Paste a link" value="${esc(prefill||"")}">
-  <label class="f">Category</label>
-  <div class="chips" id="cats">${CATS.map(([k,n])=>`<button class="chip" data-k="${k}" aria-pressed="${k===cat}">${esc(n)}</button>`).join("")}</div>
-  <label class="f" for="note">Note <span class="hint" style="font-weight:400">(optional)</span></label>
-  <textarea class="t" id="note" placeholder="Why this caught your eye"></textarea>
-  <div style="margin-top:22px"><button class="primary" id="save">Save to Weave</button></div>
-  <p class="err" id="err"></p>`;
-  document.querySelectorAll("#cats .chip").forEach(b=>b.onclick=()=>{ cat=b.dataset.k; document.querySelectorAll("#cats .chip").forEach(x=>x.setAttribute("aria-pressed", x===b)); });
-  document.getElementById("save").onclick = async e=>{
-    const url=document.getElementById("url").value.trim(), note=document.getElementById("note").value.trim();
-    const err=document.getElementById("err");
-    if(!isYouTube(url)){ err.textContent="That doesn't look like a YouTube link. Articles and PDFs come in a later version."; return; }
-    e.target.disabled=true; e.target.textContent="Saving";
-    const stamp=new Date().toISOString(); const name=stamp.replace(/[:.]/g,"-")+".json";
-    const item={url, category:cat, note, added_at:stamp};
-    try{
-      await gh(`contents/inbox/${name}`,{method:"PUT",body:JSON.stringify({message:`Add ${cat} item`,content:b64(JSON.stringify(item,null,2))})});
-      store("weave.lastcat",cat);
-      toast("Saved. Your card will be ready in a few minutes.");
-      history.replaceState(null,"",location.pathname); go("#");
-    }catch(x){ err.textContent=x.message; e.target.disabled=false; e.target.textContent="Save to Weave"; }
-  };
-}
-
-const LIFE = "life-top10";
-const LEVELNAME = {observed:"Observed",correlated:"Correlated",causal:"Causal",unknown:"Mechanism unknown"};
-const KINDNAME = {practice:"Do this",understanding:"Best current answer"};
-const VERB = {strengthens:"Strengthens",adds:"Adds to",narrows:"Narrows",contradicts:"Contradicts"};
-
-function render(html, tab){
-  app.innerHTML = html;
-  syncBar(tab);
-}
-function syncBar(tab){
-  const bar = document.getElementById("bar");
-  bar.hidden = !token();
-  bar.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-current", b.dataset.tab===tab ? "page" : "false"));
-}
-function back(){ if(history.length>1) history.back(); else go("#"); }
-const backBtn = `<button class="iconbtn" onclick="back()">Back</button>`;
-
-async function load(force){
-  if(state.loaded && !force) return;
-  const [index, inbox, failed, hist, cats, life] = await Promise.all([
-    ghJSON("cards/index.json").catch(()=>null),
-    gh("contents/inbox").catch(()=>null),
-    gh("contents/failed").catch(()=>null),
-    gh("contents/history").catch(()=>null),
-    ghJSON("categories.json").catch(()=>null),
-    ghJSON(`takeaways/${LIFE}.json`).catch(()=>null)
-  ]);
-  state.histories = (hist||[]).filter(f=>f.name.endsWith(".md")).map(f=>f.name.slice(0,-3)).filter(k=>CATNAME[k]);
-  state.cards = index || [];
-  state.pending = (inbox||[]).filter(f=>f.name.endsWith(".json"));
-  state.failed = (failed||[]).filter(f=>f.name.endsWith(".json"));
-  state.cats = cats || {};
-  state.life = life;
-  state.tk = {}; state.ledger = {}; state.changes = null;
-  state.loaded = true;
-}
-async function takeaways(k){ if(!(k in state.tk)) state.tk[k] = await ghJSON(`takeaways/${k}.json`).catch(()=>null); return state.tk[k]; }
-async function changes(){ if(!state.changes) state.changes = await ghJSON("takeaways/changes.json").catch(()=>null) || {weeks:[]}; return state.changes; }
-async function ledger(k){
-  if(!(k in state.ledger)){
-    const t = await gh(`contents/ledger/${k}.jsonl`,{raw:true}).catch(()=>null);
-    state.ledger[k] = (t||"").split("\n").filter(Boolean).map(l=>{ try{ return JSON.parse(l); }catch(e){ return null; } }).filter(Boolean);
-  }
-  return state.ledger[k];
-}
-
-function weekLabel(w){ const m = String(w||"").match(/W(\d+)/); return m ? `week ${+m[1]}` : ""; }
-function costWord(v){ return v<=2 ? "low" : v===3 ? "medium" : "high"; }
-
-// One takeaway row: rank, score bar with range, the line, a two-line why, chips. Tap for the evidence.
-function takeawayRow(t, list, prev){
-  const r = t.ratings || {}, rg = t.range || [t.score,t.score];
-  const cats = list===LIFE ? (t.categories||[]).map(k=>`<span class="tchip">${esc(CATNAME[k]||k)}</span>`).join("") : "";
-  return `<div class="tk">
-    <button class="tkmain" onclick="this.parentNode.classList.toggle('open')" aria-label="Takeaway ${t.rank}">
-      <span class="rank">${t.rank}</span>
-      <span class="tkbody">
-        <span class="sbar" aria-label="Score ${t.score}, range ${rg[0]} to ${rg[1]}"><span class="rg" style="left:${rg[0]}%;width:${Math.max(1,rg[1]-rg[0])}%"></span><span class="fill" style="width:${t.score}%"></span></span>
-        <span class="sline"><b>${t.score}</b><small>range ${rg[0]} to ${rg[1]}</small>${t.tied_with_prev && prev ? `<small class="tie">roughly tied with #${prev.rank}</small>` : ""}</span>
-        <span class="tktext">${esc(t.text)}</span>
-        <span class="tkwhy">${esc(t.why)}</span>
-        <span class="tchips"><span class="tchip lv">${esc(LEVELNAME[t.level]||"Mechanism unknown")}</span><span class="tchip">Cost ${costWord(r.C)}</span><span class="tchip">Risk ${costWord(r.R)}</span>${t.philosophy?`<span class="tchip ph">Philosophy, not established science</span>`:""}${t.unverified_only?`<span class="tchip lead">Unverified leads only</span>`:""}${cats}</span>
-      </span>
-    </button>
-    <div class="tkmore">
-      <p class="kind">${esc(KINDNAME[t.kind]||"")}</p>
-      <div class="ings">${[["I","Impact"],["E","Evidence"],["B","Breadth"],["C","Cost"],["R","Risk"]].map(([k,n])=>`<span><small>${n}</small><b>${r[k]||"?"}</b>/5</span>`).join("")}</div>
-      ${t.unverified_only?`<p class="hint">Rests only on earlier research that has not been checked against a source yet, so evidence is capped at 2.</p>`:""}
-      <p class="sub">Supporting claims</p>
-      ${(t.support||[]).map(c=>`<div class="claim"><span class="ev ${esc(c.evidence)}"></span><div><p>${esc(c.claim)}</p><p class="hint">${claimSource(c)}</p></div></div>`).join("")}
-    </div>
-  </div>${t.drop_after?`<div class="drop"><span>Value falls off here</span></div>`:""}`;
-}
-function claimSource(c){
-  if(c.status) return "Lead from earlier research, unverified";
-  if(!c.url) return esc(c.title||"");
-  return `<a href="${esc(c.url)}${c.time?`&t=${secs(c.time)}s`:""}" target="_blank" rel="noopener">${esc(c.title||"Source")}${c.time?` at ${esc(c.time)}`:""}</a>`;
-}
-function secs(time){ return String(time).split(":").reduce((a,b)=>a*60+(+b||0),0); }
-function takeawayList(items, list){
-  return `<div class="tks">${items.map((t,i)=>takeawayRow(t, list, items[i-1])).join("")}</div>`;
-}
-
-function progress(k){
-  const qs = ((state.cats||{})[k]||{}).subquestions || [];
-  if(!qs.length) return `<p class="prog">No questions set up yet</p>`;
-  const n = s => qs.filter(q=>q.status===s).length;
-  const answered = n("answered"), partial = n("partial"), contested = n("contested"), open = qs.length-answered-partial-contested;
-  const seg = (c,cls) => c ? `<span class="${cls}" style="flex:${c}"></span>` : "";
-  return `<div class="pbar" aria-hidden="true">${seg(answered,"a")}${seg(partial,"p")}${seg(contested,"c")}${seg(open,"o")}</div>
-    <p class="prog">${qs.length} questions: ${answered?`${answered} answered, `:""}${partial} partly, ${contested} contested, ${open} open</p>`;
-}
-function tiles(){
-  const tops = (state.life||{}).category_tops || {};
-  return `<div class="grid">${CATS.map(([k,n])=>`<button class="tile" onclick="go('#cat/${k}')">
-    <span class="tname">${esc(n)}</span>
-    <span class="ttop">${tops[k] ? `<b>#1</b> ${esc(tops[k].text)}` : `<i>No takeaways yet</i>`}</span>
-    ${progress(k)}</button>`).join("")}</div>`;
-}
-function cardRow(c){
-  const share = c.ideas_total ? `<span>${c.ideas_new} of ${c.ideas_total} ideas new</span>` : "";
-  return `<button class="row" onclick="go('#card/${esc(c.id)}')">
-    <h3>${esc(c.title)}</h3><p>${esc(c.claim||c.about||"")}</p>
-    <div class="meta"><span>${c.minutes} min</span>${share}<span>Worth it ${dots(c.attention||1)}</span>${c.map&&c.map.some(m=>m.effect==="contradicts")?`<span style="color:var(--disputed);font-weight:600">Contradicts the map</span>`:""}<span>${when(c.added_at)}</span></div>
-  </button>`;
-}
-async function notices(){
-  let html = "";
-  if(state.pending.length){
-    html += `<p class="sectionhead">Being processed</p><div class="list">${state.pending.map(()=>`<div class="row pending"><h3>Reading the video</h3><p>Usually a few minutes. This page checks again on its own.</p></div>`).join("")}</div>`;
-  }
-  if(state.failed.length){
-    const items = await Promise.all(state.failed.map(f=>ghJSON(`failed/${f.name}`).catch(()=>null)));
-    html += `<p class="sectionhead">Could not process</p><div class="list">${items.filter(Boolean).map(it=>`<div class="row failed"><h3>${esc(it.url)}</h3><p>${esc(it.error||"Unknown problem")}</p></div>`).join("")}</div>`;
-  }
-  return html;
-}
-
-async function libraryView(){
-  if(!token()) return settingsView();
-  const top = header(menuBtn()) + `<h1 class="ctitle">Library</h1>`;
-  if(!state.loaded) render(top + `<p class="hint">Loading</p>`, "");
-  try{ await load(true); }catch(e){ return settingsView(e.message); }
-  const life = state.life;
-  let html = top + await notices();
-  html += `<div class="h2row"><h2 class="h2">Life Top 10</h2>${life?`<a href="#changes" class="small">${esc(weekLabel(life.week))} changes</a>`:""}</div>`;
-  html += life && life.items && life.items.length
-    ? `<p class="hint sub0">Ranked by what each gives back for what it costs.</p>` + takeawayList(life.items, LIFE)
-    : `<div class="empty"><p class="hint" style="margin:0">Your first ranking appears after the weekly run.</p></div>`;
-  html += `<h2 class="h2">Categories</h2>` + tiles();
-  if(state.cards.length) html += `<h2 class="h2">Latest cards</h2><div class="list">${state.cards.slice(0,3).map(cardRow).join("")}</div>`;
-  else if(!state.pending.length) html += `<div class="empty"><h2>No cards yet</h2><p class="hint" style="margin:0">Tap Share on any YouTube video, choose Weave, and pick a category. Or tap Add.</p></div>`;
-  render(html, "");
-  clearTimeout(state.poll);
-  if(state.pending.length && location.hash==="#library") state.poll = setTimeout(libraryView, 30000);
-}
-
-async function catsView(){
-  render(header(backBtn) + `<p class="hint">Loading</p>`, "");
-  try{ await load(); }catch(e){ return settingsView(e.message); }
-  render(header(backBtn) + `<h2 class="h2">Categories</h2>` + tiles(), "");
-}
-
-const TABS = [["top","Top 10"],["map","Map"],["sources","Sources"],["history","History"]];
-async function categoryView(k, tab){
-  if(!CATNAME[k]) return go("#");
-  tab = TABS.some(t=>t[0]===tab) ? tab : "top";
-  const head = header(backBtn) + `<p class="hint" style="margin:0">Category</p><h1 class="ctitle">${esc(CATNAME[k])}</h1>
-    <nav class="tabs" role="tablist">${TABS.map(([t,n])=>`<button role="tab" aria-selected="${t===tab}" onclick="location.replace('#cat/${k}/${t}')">${n}</button>`).join("")}</nav>`;
-  render(head + `<p class="hint">Loading</p>`, "");
-  let body = "";
+// queue: questions not yet in the vault. recent: the last few, for this screen only.
+let flushing = false;
+async function flush(){
+  if (flushing || !token() || !navigator.onLine) return;
+  flushing = true;
   try{
-    await load();
-    if(tab==="top") body = await topTab(k);
-    else if(tab==="map") body = await mapTab(k);
-    else if(tab==="sources") body = sourcesTab(k);
-    else body = await historyTab(k, k);
-  }catch(e){ body = `<p class="err">${esc(e.message)}</p>`; }
-  render(head + body, "");
-}
-async function topTab(k){
-  const d = await takeaways(k);
-  const q = ((state.cats||{})[k]||{}).question;
-  let html = q ? `<p class="gq">${esc(q)}</p>` : "";
-  if(!d || !d.items || !d.items.length) return html + `<div class="empty"><p class="hint" style="margin:0">No takeaways yet. They are built each week from the cards you add here.</p></div>`;
-  return html + `<p class="hint sub0" style="margin-top:12px">Updated ${esc(weekLabel(d.week))}. Tap a row for the evidence.</p>` + takeawayList(d.items, k);
-}
-async function mapTab(k){
-  const cat = (state.cats||{})[k] || {};
-  const qs = cat.subquestions || [];
-  if(!qs.length) return `<div class="empty"><p class="hint" style="margin:0">No sub-questions set up for this category yet.</p></div>`;
-  const L = await ledger(k);
-  const cards = state.cards.filter(c=>c.category===k);
-  const STATUS = {answered:"Answered",partial:"Partly answered",contested:"Contested",open:"Open"};
-  let html = `<div style="margin-top:12px">${progress(k)}</div>`, track = null;
-  qs.forEach(q=>{
-    if(q.track && q.track!==track){ track=q.track; html += `<p class="sectionhead">${esc((cat.tracks||{})[track]||track)}</p>`; }
-    const claims = L.filter(c=>c.q===q.id && c.status!=="rejected by prior research");
-    const verified = claims.filter(c=>!c.status), leads = claims.filter(c=>c.status);
-    const touched = cards.filter(c=>(c.map||[]).some(m=>m.q===q.id));
-    html += `<div class="tk"><button class="qrow" onclick="this.parentNode.classList.toggle('open')">
-      <span class="qid">${esc(q.id)}</span><span class="tkbody"><span class="tktext">${esc(q.text)}</span>
-      <span class="tchips"><span class="tchip st-${esc(q.status||"open")}">${esc(STATUS[q.status]||"Open")}</span><span class="tchip">${verified.length} checked</span><span class="tchip">${leads.length} leads</span>${touched.length?`<span class="tchip">${touched.length} card${touched.length>1?"s":""}</span>`:""}</span></span></button>
-      <div class="tkmore">${claims.length?claims.map(c=>`<div class="claim"><span class="ev ${esc(c.evidence)}"></span><div><p>${esc(c.claim)}</p><p class="hint">${claimSource(c)}</p></div></div>`).join(""):`<p class="hint">No claims yet.</p>`}
-      ${touched.map(c=>`<p class="hint"><a href="#card/${esc(c.id)}">${esc(c.title)}</a>: ${esc(((c.map||[]).find(m=>m.q===q.id)||{}).effect||"")}</p>`).join("")}</div></div>`;
-  });
-  return html;
-}
-function sourcesTab(k){
-  const cards = state.cards.filter(c=>c.category===k);
-  return cards.length ? `<div class="list">${cards.map(cardRow).join("")}</div>`
-    : `<div class="empty"><p class="hint" style="margin:0">No cards in this category yet.</p></div>`;
-}
-async function historyTab(list, k){
-  const ch = await changes();
-  let html = "";
-  const weeks = (ch.weeks||[]).map(w=>({w, moves:(w.moves||[]).filter(m=>m.list===list)})).filter(x=>x.moves.length);
-  html += weeks.length ? weeks.map(({w,moves})=>`<p class="sectionhead">${esc(weekLabel(w.week)).replace(/^w/,"W")}</p><div class="list">${moves.map(m=>{
-      const what = m.from==null ? `New at #${m.to}` : m.to==null ? `Left the list from #${m.from}` : m.to<m.from ? `Rose from #${m.from} to #${m.to}` : m.to>m.from ? `Fell from #${m.from} to #${m.to}` : `Stayed at #${m.to}`;
-      const sc = m.score_from!=null && m.score_to!=null && m.score_from!==m.score_to ? `, score ${m.score_from} to ${m.score_to}` : (m.score_to!=null && m.from==null ? `, score ${m.score_to}` : "");
-      const why = m.from==null && m.reason==="New this week" ? "" : ` ${esc(m.reason||"")}`;
-      return `<div class="row"><h3>${esc(m.text||m.id)}</h3><p>${what}${sc}.${why}</p></div>`;}).join("")}</div>`).join("")
-    : `<div class="empty"><p class="hint" style="margin:0">No weekly changes yet.</p></div>`;
-  if(k && state.histories.includes(k)) html += `<p class="sectionhead">Before Weave</p><div class="list"><button class="row" onclick="go('#history/${k}')"><h3>Research story</h3><p>How the thinking got here: what changed, what was corrected, and what it taught.</p></button></div>`;
-  return html;
-}
-async function changesView(){
-  render(header(backBtn) + `<p class="hint">Loading</p>`, "");
-  let body;
-  try{ body = await historyTab(LIFE, null); }catch(e){ body = `<p class="err">${esc(e.message)}</p>`; }
-  render(header(backBtn) + `<h1 class="ctitle">Life Top 10: weekly changes</h1>` + body, "");
-}
-
-function detailsHTML(c){
-  const yt = t => `https://www.youtube.com/watch?v=${c.video_id}&t=${Math.floor(t)}s`;
-  const others = (c.map||[]).filter(m=>m.effect!=="contradicts");
-  const mapItems = arr => arr.map(m=>`<div class="mapitem"><span class="badge ${m.effect}">${VERB[m.effect]} ${esc(m.q)}</span><span>${esc(m.note||"")}</span></div>`).join("");
-  const density = s => s.points.length===0?"":(s.points.length<3?"d1":(s.points.length<6?"d2":"d3"));
-  let html = `<section class="block"><h2>Explain like I'm 5</h2><p class="eli5">${esc(c.eli5)}</p></section>
-    <section class="block"><h2>Our map</h2>${others.length?`<div class="map">${mapItems(others)}</div>`:""}${c.nothing_new?`<p class="hint" style="margin:${others.length?"8px":"0"} 0 0">Nothing new for the map. Safe to skip.</p>`:(!(c.map||[]).length?`<p class="hint" style="margin:0">No sub-questions set up for this category yet.</p>`:"")}</section>
-    <section class="block"><h2>Coverage</h2>
-      <div class="thread" aria-hidden="true">${c.sections.map(s=>`<span class="${density(s)}"></span>`).join("")}</div>
-      <p class="hint" style="margin:6px 0 0">${c.coverage.with_points} of ${c.coverage.sections} sections had key points.${c.rejected_points?` ${c.rejected_points} point${c.rejected_points>1?"s were":" was"} dropped because the quote could not be found in the transcript.`:""}</p>
-      <div class="legend">${Object.keys(EVNAME).map(k=>`<span class="ev ${k}">${EVNAME[k]}</span>`).join("")}</div>
-    </section>`;
-  c.sections.forEach(s=>{
-    html += `<section class="sec"><h3><span>${esc(s.label)}</span><small>${esc(s.start)} to ${esc(s.end)}</small></h3>`;
-    if(!s.points.length) html += `<p class="skip">No key points: ${esc(s.skip_reason)}</p>`;
-    s.points.forEach(p=>{
-      html += `<div class="pt"><div class="imp">${dots(p.importance)}</div><div><p>${esc(p.point)}</p>
-        <div class="tags"><span class="ev ${p.evidence}">${EVNAME[p.evidence]||p.evidence}</span><a class="ts" href="${yt(p.t)}" target="_blank" rel="noopener">Play ${esc(p.time)}</a>${p.same_as?`<span class="hint">In your map</span>`:""}</div></div>
-        ${p.use_it?`<div class="useit"><b>Use it:</b> ${esc(p.use_it)}</div>`:""}</div>`;
-    });
-    html += `</section>`;
-  });
-  return html;
-}
-function ideasHTML(c){
-  const known = {}; (c.matches||[]).forEach(m=>known[`${m.section}/${m.point}`]=m);
-  const fresh = [], seen = [];
-  c.sections.forEach((s,si)=>s.points.forEach((p,pi)=>{ const m = known[`${si}/${pi}`]; (m?seen:fresh).push({p,m}); }));
-  return `<p class="sub">New to your map</p>${fresh.length?fresh.map(({p})=>`<div class="claim"><span class="ev ${p.evidence}"></span><div><p>${esc(p.point)}</p><p class="hint">${esc(p.time)}</p></div></div>`).join(""):`<p class="hint">None.</p>`}
-    <p class="sub">Already in your map</p>${seen.length?seen.map(({p,m})=>`<div class="claim"><span class="ev ${p.evidence}"></span><div><p>${esc(p.point)}</p><p class="hint">Matches: ${esc(m.claim)}${m.prior?" (an unverified lead, now backed by this video)":""}</p></div></div>`).join(""):`<p class="hint">None.</p>`}`;
-}
-
-async function cardView(id){
-  render(header(backBtn) + `<p class="hint">Opening card</p>`, "");
-  let c;
-  try{ c = await ghJSON(`cards/${id}.json`); }catch(e){ app.innerHTML += `<p class="err">${esc(e.message)}</p>`; return; }
-  if(!c){ app.innerHTML += `<p class="err">That card was not found.</p>`; return; }
-  const contra = (c.map||[]).filter(m=>m.effect==="contradicts");
-  const short = !!c.claim;
-  let html = header(backBtn) + `<article class="card">
-    <p class="hint" style="margin:0">${esc(c.category_name||"")}${c.channel?`, ${esc(c.channel)}`:""}</p>
-    <h1>${esc(c.title)} <span class="mins">(${c.minutes} min)</span></h1>
-    ${c.transcript_source==="ai"?`<p class="hint">No captions were available, so the transcript was written by AI and may not be word for word.</p>`:""}
-    ${contra.length?`<section class="block alert"><h2>This contradicts the map</h2><div class="map">${contra.map(m=>`<div class="mapitem"><span class="badge contradicts">Contradicts ${esc(m.q)}</span><span>${esc(m.note||"")}</span></div>`).join("")}</div></section>`:""}
-    ${short?`<section class="block short">
-      <div class="kv"><span class="k">Claim</span><p>${esc(c.claim)}</p></div>
-      <div class="kv"><span class="k">Happening</span><p>${esc(c.happening)}</p>
-        <p class="tchips"><span class="tchip lv">Science level: ${esc((LEVELNAME[c.science_level]||"unknown").toLowerCase())}</span>${c.philosophy?`<span class="tchip ph">Philosophy, not established science</span>`:""}</p></div>
-      <div class="kv"><span class="k">Left</span><p class="left">${esc(c.left)}</p></div>
-      ${c.ideas_total!=null?`<button class="kv ideas" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden" aria-label="Show which ideas were new"><span class="k">Ideas</span><p>${c.ideas_total} total · ${c.ideas_known} already in your map · ${c.ideas_new} new</p></button><div class="ideaslist" hidden>${ideasHTML(c)}</div>`:""}
-    </section>`:`<section class="block"><h2>About</h2><p class="eli5">${esc(c.about)}</p><p class="hint" style="margin:8px 0 0">This card was made before short cards. Details has everything.</p></section>`}
-    <button class="detailsbtn" onclick="const d=document.getElementById('details'); d.hidden=!d.hidden; this.textContent=d.hidden?'Details':'Hide details'">Details</button>
-    <div id="details" hidden>${detailsHTML(c)}</div>
-    <section class="block" style="margin-top:20px"><a href="${esc(c.url)}" target="_blank" rel="noopener">Open the video</a> &nbsp; <a href="https://github.com/${esc(repo())}/blob/main/transcripts/${esc(c.video_id)}.json" target="_blank" rel="noopener">Full transcript</a></section></article>`;
-  render(html, ""); window.scrollTo(0,0);
-}
-
-// ---------------------------------------------------------------- Version 2: shared
-
-const AREAS = [["health","Health"],["family","Family"],["wealth","Wealth"],["growth","Growth"],["meaning","Meaning"]];
-const AREANAME = Object.fromEntries(AREAS);
-const AREAICON = {
-  health:`<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>`,
-  family:`<circle cx="8" cy="8" r="3"/><circle cx="16" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.2-6 5-6s5 2.7 5 6M13 20c0-2.8 1.3-5 3-5s3 2.2 3 5"/>`,
-  wealth:`<circle cx="12" cy="12" r="8"/><path d="M12 7v10M9.5 9.5c0-1 1-1.5 2.5-1.5s2.5.7 2.5 1.8-1 1.5-2.5 1.7-2.5.7-2.5 1.8 1 1.7 2.5 1.7 2.5-.6 2.5-1.5"/>`,
-  growth:`<path d="M4 18l6-6 4 4 6-8M15 8h5v5"/>`,
-  meaning:`<circle cx="12" cy="12" r="8"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>`
-};
-function areaIcon(a){ return `<svg class="ai ${esc(a)}" viewBox="0 0 24 24" aria-label="${esc(AREANAME[a]||a)}">${AREAICON[a]||""}</svg>`; }
-const PROFILE_LABEL = {age_range:"age range", country:"country", goals_10y:"goals for the next 10 years", businesses:"businesses and role", family_priorities:"family priorities", daily_minutes:"daily time", health_markers:"health markers", industries:"industries"};
-function isoDay(d){ const x = d || new Date(); return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`; }
-function addDays(day, n){ const d = new Date(day+"T12:00:00"); d.setDate(d.getDate()+n); return isoDay(d); }
-function prettyDay(day){ try{ return new Date(day+"T12:00:00").toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"short"}); }catch(e){ return day; } }
-
-// Files the app writes in the vault: read with their sha, write back, retry once on a conflict.
-function fromB64(s){ const bin = atob(String(s).replace(/\n/g,"")); return new TextDecoder().decode(Uint8Array.from(bin, c=>c.charCodeAt(0))); }
-async function readFile(p){ const r = await gh(`contents/${p}`); return r ? {data: JSON.parse(fromB64(r.content)), sha: r.sha} : {data:null, sha:null}; }
-async function updateFile(p, change, message){
-  for(let i=0;;i++){
-    const {data, sha} = await readFile(p);
-    const next = change(data);
-    try{
-      await gh(`contents/${p}`, {method:"PUT", body: JSON.stringify({message, content: b64(JSON.stringify(next,null,2)+"\n"), ...(sha?{sha}:{})})});
-      return next;
-    }catch(e){ if(i>=1) throw e; }
-  }
-}
-
-async function loadV2(force){
-  if(state.v2 && !force) return state.v2;
-  const [profile, moves, log, world] = await Promise.all([
-    ghJSON("profile.json").catch(()=>null), ghJSON("today/moves.json").catch(()=>null),
-    ghJSON("app/today-log.json").catch(()=>null), ghJSON("world/items.json").catch(()=>null)
-  ]);
-  state.v2 = {profile: profile || {}, moves, log: (log && log.entries) || [], world};
-  return state.v2;
-}
-function missingProfile(fields){
-  const p = (state.v2 && state.v2.profile) || {};
-  return fields.filter(f => p[f]==null || p[f]==="" || (Array.isArray(p[f]) && !p[f].length));
-}
-// Ask once: a missing field that matters is asked about until Rohit fills it or taps Later.
-function askOnce(fields, why){
-  const miss = missingProfile(fields).filter(f => !store("weave.asked."+f));
-  if(!miss.length) return "";
-  return `<div class="ask"><p><b>Fill in your ${esc(miss.map(f=>PROFILE_LABEL[f]||f).join(", "))}.</b> ${esc(why)}</p>
-    <div class="askbtns"><button class="primary sm" onclick="go('#profile')">Fill in</button><button class="iconbtn" onclick="${miss.map(f=>`store('weave.asked.${f}','1')`).join(";")};this.closest('.ask').remove()">Later</button></div></div>`;
-}
-
-function menuBtn(){ return `<button class="iconbtn" onclick="toggleMenu()" aria-haspopup="true" aria-label="Menu">Menu</button>`; }
-function toggleMenu(){
-  const old = document.getElementById("menu"); if(old){ old.remove(); return; }
-  const m = document.createElement("div"); m.id="menu"; m.className="menu"; m.setAttribute("role","menu");
-  m.innerHTML = [["#library","Library","Top 10s, categories and cards"],["#profile","Profile","What every tab is fitted to"],["#settings","Connection","Vault and access key"]]
-    .map(([h,n,d])=>`<button role="menuitem" onclick="document.getElementById('menu').remove();go('${h}')"><b>${n}</b><span>${d}</span></button>`).join("");
-  document.body.appendChild(m);
-  setTimeout(()=>document.addEventListener("click", function close(e){ if(!m.contains(e.target)){ m.remove(); document.removeEventListener("click", close); } }),0);
-}
-const topbar = () => header(menuBtn());
-async function v2Page(tab, build){
-  if(!token()) return settingsView();
-  render(topbar() + `<p class="hint">Loading</p>`, tab);
-  let html;
-  try{ await loadV2(true); html = await build(); }catch(e){ html = `<p class="err">${esc(e.message)}</p>`; }
-  render(topbar() + html, tab);
-}
-
-// ---------------------------------------------------------------- Today
-
-// The entry that counts as "done now": today for daily moves, this week (from Monday) for weekly ones.
-function current(m, e){
-  const day = isoDay();
-  return e.id===m.id && (m.cadence==="daily" ? e.date===day : m.cadence==="weekly" ? e.date>=addDays(day, -((new Date().getDay()+6)%7)) : true);
-}
-function ticksFor(m, log){ return {done: log.some(e=>current(m,e)), count: log.filter(e=>e.id===m.id).length}; }
-function moveCard(m, log){
-  const t = ticksFor(m, log);
-  return `<div class="move ${t.done?"done":""}" data-id="${esc(m.id)}">
-    <div class="mvrow">
-      <button class="mvmain" onclick="this.closest('.move').classList.toggle('open')">
-        ${areaIcon(m.area)}
-        <span class="mvtext"><span class="mvaction">${esc(m.action)}</span><span class="mvmeta">${esc(m.time)}${t.count?` · done ${t.count} time${t.count>1?"s":""}`:""}</span></span>
-      </button>
-      <button class="tick" aria-pressed="${t.done}" aria-label="${t.done?"Done. Tap to undo":"Mark done"}" onclick="tickMove('${esc(m.id)}')"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
-    </div>
-    <div class="mvmore">
-      <p><span class="k">How you'll know</span>${esc(m.check)}</p>
-      <p><span class="k">Why</span>${esc(m.why)}</p>
-      <p><span class="k">Evidence</span>${(m.evidence||[]).map(e=>`<a href="${esc(e.route||"#library")}">${esc(e.text)}</a>`).join("<br>")}</p>
-      ${m.medical?`<p class="hint">Discuss with your doctor before changing any treatment.</p>`:""}
-    </div>
-  </div>`;
-}
-async function tickMove(id){
-  const v = state.v2, m = ((v.moves||{}).moves||[]).find(x=>x.id===id); if(!m) return;
-  const day = isoDay(), t = ticksFor(m, v.log);
-  const el = document.querySelector(`.move[data-id="${CSS.escape(id)}"]`); if(el) el.classList.toggle("done", !t.done);
-  try{
-    const next = await updateFile("app/today-log.json", d => {
-      const entries = (d && d.entries) || [];
-      const i = entries.map(e=>current(m,e)).lastIndexOf(true);
-      if(t.done){ if(i>=0) entries.splice(i,1); }
-      else if(i<0) entries.push({id, date: day, area: m.area, action: m.action});
-      return {entries};
-    }, t.done ? `Undo ${id}` : `Done: ${id}`);
-    v.log = next.entries; route();
-  }catch(e){ if(el) el.classList.toggle("done", t.done); toast(e.message); }
-}
-function todayView(){
-  return v2Page("today", async ()=>{
-    const v = state.v2, moves = (v.moves && v.moves.moves) || [];
-    let html = `<p class="dayline">${esc(prettyDay(isoDay()))}</p>`;
-    html += askOnce(["age_range","daily_minutes","goals_10y"], "Your moves use placeholders until then.");
-    html += moves.length ? `<div class="moves">${moves.map(m=>moveCard(m, v.log)).join("")}</div>`
-      : `<div class="empty"><p class="hint" style="margin:0">Your first moves arrive with the weekly run.</p></div>`;
-    const done = v.log.filter(e=>e.date===isoDay()).length;
-    html += `<div class="h2row"><p class="hint">${done?`${done} done today.`:"Tap the circle when a move is done."}</p><a href="#today/history" class="small">History</a></div>`;
-    const inbox = ((await gh("contents/inbox").catch(()=>null))||[]).filter(f=>f.name.endsWith(".json")).length;
-    if(inbox) html += `<p class="hint"><a href="#library">${inbox} video${inbox>1?"s":""} being read</a></p>`;
-    return html;
-  });
-}
-function todayHistoryView(){
-  return v2Page("today", async ()=>{
-    const byDay = {};
-    state.v2.log.forEach(e=>(byDay[e.date]=byDay[e.date]||[]).push(e));
-    const days = Object.keys(byDay).sort().reverse();
-    return `<h1 class="ctitle">What you did</h1>` + (days.length ? days.map(d=>`<p class="sectionhead">${esc(prettyDay(d))}</p><div class="list">${byDay[d].map(e=>`<div class="row hrow">${areaIcon(e.area)}<p>${esc(e.action)}</p></div>`).join("")}</div>`).join("")
-      : `<div class="empty"><p class="hint" style="margin:0">Nothing ticked yet.</p></div>`);
-  });
-}
-
-// ---------------------------------------------------------------- World
-
-const LANES = [["health","Health"],["ai","AI and tech"],["industries","Your industries"],["money","Money"]];
-const HORIZONS = [1,3,5,10];
-const STATUSNAME = {claimed:"Claimed",trials:"In trials or pilots",adopted:"Approved or adopted"};
-function worldDot(t){
-  return `<button class="wd" onclick="openWorld('${esc(t.id)}')" aria-label="${esc(t.title)}">
-    <span class="dot st-${esc(t.status)} lk-${esc(t.likelihood)}"></span><span class="wt">${esc(t.label||t.title)}</span></button>`;
-}
-function worldDetail(t){
-  const lk = {low:1,medium:2,high:3}[t.likelihood]||1;
-  return `<div class="wdetail"><button class="iconbtn close" onclick="this.parentNode.remove()" aria-label="Close">Close</button>
-    <p class="wdh">${esc(t.title)}</p>
-    <p class="tchips"><span class="tchip st-${esc(t.status)}">${t.major && t.status==="claimed" ? "Claimed, not verified" : esc(STATUSNAME[t.status]||t.status)}</span>
-      <span class="tchip">Likelihood ${esc(t.likelihood)} <span class="meter">${[1,2,3].map(i=>`<i class="${i<=lk?"on":""}"></i>`).join("")}</span></span>
-      <span class="tchip">${t.horizon} year${t.horizon>1?"s":""}</span></p>
-    <p><span class="k">What it means for you</span>${esc(t.means)}</p>
-    <p><span class="k">Do now</span>${esc(t.do_now)}</p>
-    <p><span class="k">Signposts to watch</span>${(t.signposts||[]).map(esc).join("<br>")}</p>
-    <p><span class="k">Sources</span>${(t.sources||[]).map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>${s.date?` <small>${esc(s.date)}</small>`:""}`).join("<br>")}</p>
-  </div>`;
-}
-function openWorld(id){
-  const t = ((state.v2.world||{}).items||[]).find(x=>x.id===id); if(!t) return;
-  document.querySelectorAll(".wdetail").forEach(x=>x.remove());
-  const lane = document.querySelector(`.lane[data-lane="${CSS.escape(t.lane)}"]`);
-  lane.insertAdjacentHTML("beforeend", worldDetail(t));
-  lane.querySelector(".wdetail").scrollIntoView({behavior:"smooth", block:"nearest"});
-}
-function worldView(){
-  return v2Page("world", async ()=>{
-    const w = state.v2.world, items = (w && w.items) || [];
-    if(!items.length) return `<h1 class="ctitle">What is coming</h1><div class="empty"><p class="hint" style="margin:0">The timeline fills in with the weekly run.</p></div>`;
-    let html = `<h1 class="ctitle">What is coming</h1>
-      <div class="legend wl"><span><span class="dot st-adopted lk-high"></span>Adopted</span><span><span class="dot st-trials lk-high"></span>In trials</span><span><span class="dot st-claimed lk-high"></span>Claimed</span><span class="hint">Bigger dot, more likely</span></div>
-      <div class="wgrid whead">${HORIZONS.map(h=>`<span>${h} yr${h>1?"s":""}</span>`).join("")}</div>`;
-    LANES.forEach(([k,n])=>{
-      const mine = items.filter(t=>t.lane===k);
-      if(!mine.length) return;
-      html += `<section class="lane" data-lane="${k}"><p class="lanename">${n}</p><div class="wgrid">${HORIZONS.map(h=>`<div class="wcell">${mine.filter(t=>t.horizon===h).map(worldDot).join("")}</div>`).join("")}</div></section>`;
-    });
-    html += `<p class="hint">Updated ${esc(weekLabel(w.week))}. ${w.searches?`${w.searches.length} web searches.`:""} Tap a dot for what it means and what to do now.</p>`;
-    html += askOnce(["businesses"], "World fits your industries and role once it knows them.");
-    return html;
-  });
-}
-
-// ---------------------------------------------------------------- Profile
-
-const AGE_RANGES = ["18 to 29","30 to 39","40 to 49","50 to 59","60 to 69","70 or older"];
-function profileView(){
-  return v2Page("", async ()=>{
-    const p = state.v2.profile;
-    const lines = k => esc((p[k]||[]).join("\n"));
-    const area = (k, label, hint) => `<label class="f" for="pf-${k}">${label}</label><textarea class="t" id="pf-${k}" placeholder="${esc(hint)}">${lines(k)}</textarea>`;
-    return `<h1 class="ctitle">Profile</h1><p class="hint" style="margin:0">Private, saved in your vault. Every tab is fitted to it. One item per line.</p>
-      <label class="f" for="pf-age_range">Age range</label>
-      <select class="t" id="pf-age_range"><option value="">Not set</option>${AGE_RANGES.map(a=>`<option ${p.age_range===a?"selected":""}>${a}</option>`).join("")}</select>
-      <label class="f" for="pf-country">Country</label><input class="t" id="pf-country" value="${esc(p.country||"")}">
-      ${area("goals_10y","Goals for the next 10 years","Build the battery business to ...")}
-      ${area("businesses","Your businesses and role","Footwear company: managing director")}
-      ${area("industries","Industries to watch","footwear")}
-      ${area("family_priorities","Family priorities","Time with the kids every evening")}
-      ${area("health_markers","Health markers to track (optional)","Resting heart rate")}
-      <label class="f" for="pf-daily_minutes">Realistic time a day for moves, in minutes</label>
-      <input class="t" id="pf-daily_minutes" type="number" inputmode="numeric" min="5" max="240" value="${esc(p.daily_minutes??"")}">
-      <div style="margin-top:22px"><button class="primary" id="saveprofile">Save profile</button></div><p class="err" id="err"></p>`;
-  }).then(()=>{
-    const btn = document.getElementById("saveprofile"); if(!btn) return;
-    btn.onclick = async ()=>{
-      const val = id => document.getElementById("pf-"+id).value.trim();
-      const list = id => val(id).split("\n").map(s=>s.trim()).filter(Boolean);
-      const mins = parseInt(val("daily_minutes"),10);
-      const fields = {age_range: val("age_range"), country: val("country"), goals_10y: list("goals_10y"), businesses: list("businesses"),
-        industries: list("industries"), family_priorities: list("family_priorities"), health_markers: list("health_markers"),
-        daily_minutes: mins>0 ? Math.min(mins,240) : null};
-      btn.disabled = true; btn.textContent = "Saving";
-      try{
-        state.v2.profile = await updateFile("profile.json", d => ({...(d||{}), ...fields, updated_at: new Date().toISOString()}), "Update profile");
-        toast("Profile saved. The next weekly run uses it."); back();
-      }catch(e){ document.getElementById("err").textContent = e.message; btn.disabled=false; btn.textContent="Save profile"; }
-    };
-  });
-}
-
-// ---------------------------------------------------------------- Life
-
-const HORIZON_AGE = 85;
-function ageMid(r){ const m = String(r||"").match(/(\d+)\D+(\d+)/); if(m) return (+m[1] + +m[2]) / 2; const o = String(r||"").match(/(\d+)/); return o ? +o[1] + 3 : null; }
-function horizonHTML(p){
-  const a = ageMid(p.age_range);
-  if(!a) return askOnce(["age_range"], "Life shows your time horizon from it.");
-  const years = Math.max(0, Math.round(HORIZON_AGE - a)), pct = Math.min(100, Math.round(a / HORIZON_AGE * 100));
-  return `<section class="block horizon"><p class="k">Your horizon</p>
-    <div class="hbar" aria-hidden="true"><span style="width:${pct}%"></span></div>
-    <p>Planning to age ${HORIZON_AGE}, about <b>${years} years</b> are ahead, roughly ${(years*52).toLocaleString()} weeks. A planning horizon, not a forecast.</p></section>`;
-}
-function weights(p){ const w = p.weights || {}; return Object.fromEntries(AREAS.map(([k])=>[k, Number.isFinite(+w[k]) ? +w[k] : 20])); }
-function share(obj){ const t = Object.values(obj).reduce((a,b)=>a+b,0); return Object.fromEntries(Object.entries(obj).map(([k,v])=>[k, t ? Math.round(v*100/t) : 0])); }
-function weekCheckHTML(p, log){
-  const since = addDays(isoDay(), -6), done = Object.fromEntries(AREAS.map(([k])=>[k,0]));
-  log.filter(e=>e.date>=since && done[e.area]!=null).forEach(e=>done[e.area]++);
-  const total = Object.values(done).reduce((a,b)=>a+b,0);
-  const want = share(weights(p)), did = share(done);
-  const gaps = AREAS.map(([k,n])=>({k,n,gap: did[k]-want[k]})).sort((a,b)=>a.gap-b.gap);
-  const note = !total ? "No moves ticked in the last 7 days yet." :
-    `${gaps[gaps.length-1].n} got the most time; ${gaps[0].n.toLowerCase()} got the least compared with its weight.`;
-  return `<section class="block"><div class="h2row"><p class="k">Last 7 days against your weights</p></div>
-    ${AREAS.map(([k,n])=>`<div class="cmp">${areaIcon(k)}<span class="cmpbars"><span class="want" style="width:${want[k]}%"></span><span class="did ${k}" style="width:${did[k]}%"></span></span><span class="cmpn">${did[k]}%</span></div>`).join("")}
-    <p class="hint" style="margin:8px 0 0"><span class="sw want"></span>Weight <span class="sw did"></span>Done, from ${total} tick${total===1?"":"s"}. ${esc(note)}</p></section>`;
-}
-function slidersHTML(p){
-  const w = weights(p), pc = share(w);
-  return `<section class="block"><div class="h2row"><p class="k">Your portfolio</p><button class="iconbtn" id="saveweights" hidden onclick="saveWeights()">Save</button></div>
-    ${AREAS.map(([k,n])=>`<label class="sl">${areaIcon(k)}<span class="sln">${n}</span><input type="range" min="0" max="100" step="5" value="${w[k]}" data-area="${k}" oninput="weightsChanged()"><b id="pc-${k}">${pc[k]}%</b></label>`).join("")}</section>`;
-}
-function weightsChanged(){
-  const w = {}; document.querySelectorAll(".sl input").forEach(i=>w[i.dataset.area]=+i.value);
-  const pc = share(w); Object.entries(pc).forEach(([k,v])=>document.getElementById("pc-"+k).textContent=v+"%");
-  document.getElementById("saveweights").hidden = false;
-}
-async function saveWeights(){
-  const w = {}; document.querySelectorAll(".sl input").forEach(i=>w[i.dataset.area]=+i.value);
-  const b = document.getElementById("saveweights"); b.disabled = true; b.textContent = "Saving";
-  try{ state.v2.profile = await updateFile("profile.json", d=>({...(d||{}), weights:w, updated_at:new Date().toISOString()}), "Update portfolio weights"); toast("Weights saved. Next week's moves follow them."); route(); }
-  catch(e){ toast(e.message); b.disabled=false; b.textContent="Save"; }
-}
-function evidenceCard(c){
-  return `<div class="tk"><button class="tkmain" onclick="this.parentNode.classList.toggle('open')"><span class="tkbody">
-    <span class="tktext"><span class="ev ${esc(c.label)}"></span> ${esc(c.title)}</span><span class="tkwhy">${esc(c.line)}</span></span></button>
-    <div class="tkmore"><p class="claimp">${esc(c.detail)}</p><p class="hint">${esc(EVNAME[c.label]||c.label)}</p>
-    ${(c.sources||[]).map(s=>`<p class="hint"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></p>`).join("")}</div></div>`;
-}
-function bigMoveRow(m, p){
-  const rg = m.range || [m.score,m.score], r = m.ratings||{};
-  return `<div class="tk"><button class="tkmain" onclick="this.parentNode.classList.toggle('open')">${areaIcon(m.area)}<span class="tkbody">
-    <span class="sbar"><span class="rg" style="left:${rg[0]}%;width:${Math.max(1,rg[1]-rg[0])}%"></span><span class="fill ${esc(m.area)}" style="width:${m.score}%"></span></span>
-    <span class="sline"><b>${m.score}</b><small>range ${rg[0]} to ${rg[1]}</small><small>${esc(AREANAME[m.area]||"")} weight ${share(weights(p))[m.area]}%</small></span>
-    <span class="tktext">${esc(m.text)}</span></span></button>
-    <div class="tkmore"><p class="claimp">${esc(m.why)}</p>
-    <div class="ings">${[["I","Impact"],["E","Evidence"],["B","Breadth"],["C","Cost"],["R","Risk"]].map(([k,n])=>`<span><small>${n}</small><b>${r[k]||"?"}</b>/5</span>`).join("")}</div>
-    <p class="hint">Based on: ${(m.support||[]).map(s=>esc(s.title)).join("; ")||"ledger claims"}</p></div></div>`;
-}
-function lifeView(){
-  return v2Page("life", async ()=>{
-    const v = state.v2;
-    if(!v.life) v.life = await ghJSON("life/portfolio.json").catch(()=>null);
-    const L = v.life || {};
-    let html = `<h1 class="ctitle">Life</h1>` + horizonHTML(v.profile) + slidersHTML(v.profile) + weekCheckHTML(v.profile, v.log);
-    html += `<h2 class="h2">Big Moves</h2>` + ((L.big_moves||[]).length ? `<div class="tks">${L.big_moves.map(m=>bigMoveRow(m, v.profile)).join("")}</div>`
-      : `<div class="empty"><p class="hint" style="margin:0">Big Moves arrive with the weekly run.</p></div>`);
-    if((L.evidence||[]).length) html += `<h2 class="h2">What the evidence says</h2><div class="tks">${L.evidence.map(evidenceCard).join("")}</div>`;
-    return html;
-  });
-}
-
-// ---------------------------------------------------------------- Learn
-
-const INTERVALS = [1,3,7,21];
-const FIELDNAME = {maths:"Maths",physics:"Physics",biology:"Biology",history:"History",economics:"Economics",psychology:"Psychology",philosophy:"Philosophy",contemplative:"Contemplative",mind:"Mind and reality",frontier:"Frontier"};
-// After learning: due in 1 day. Got both right: next interval (3, 7, 21), then done. Missed one: back to 1 day.
-function nextReview(r, got, day){
-  const stage = got ? (r ? r.stage + 1 : 0) : 0;
-  const history = [...((r && r.history) || []), {date: day, got}];
-  return stage >= INTERVALS.length ? {stage, due: null, history} : {stage, due: addDays(day, INTERVALS[stage]), history};
-}
-function quizHTML(idea, mode){
-  return `<div class="quiz" data-id="${esc(idea.id)}" data-mode="${mode}">${idea.questions.map((q,i)=>`<div class="qa" data-i="${i}">
-    <p class="q">${esc(q.q)}</p>
-    <button class="iconbtn reveal" onclick="revealAnswer(this)">Show answer</button>
-    <div class="ans" hidden><p>${esc(q.a)}</p><div class="askbtns"><button class="primary sm" onclick="markAnswer(this,true)">Got it</button><button class="iconbtn" onclick="markAnswer(this,false)">Missed</button></div></div>
-  </div>`).join("")}</div>`;
-}
-function revealAnswer(b){ b.hidden = true; b.nextElementSibling.hidden = false; }
-async function markAnswer(b, got){
-  const qa = b.closest(".qa"), quiz = b.closest(".quiz");
-  qa.dataset.got = got; qa.querySelector(".askbtns").innerHTML = `<span class="tchip ${got?"st-adopted":"st-claimed"}">${got?"Got it":"Missed"}</span>`;
-  const all = [...quiz.querySelectorAll(".qa")];
-  if(all.some(x=>x.dataset.got==null)) return;
-  const id = quiz.dataset.id, ok = all.every(x=>x.dataset.got==="true"), day = isoDay();
-  try{
-    const next = await updateFile("app/reviews.json", d=>{ const ideas = (d && d.ideas) || {}; ideas[id] = nextReview(ideas[id], quiz.dataset.mode==="new" ? true : ok, day); return {ideas}; },
-      `Review ${id}`);
-    state.v2.reviews = next.ideas;
-    const r = next.ideas[id];
-    quiz.insertAdjacentHTML("beforeend", `<p class="hint">${r.due ? `Next review ${esc(prettyDay(r.due))}.` : "Learned. No more reviews needed."}</p>`);
-  }catch(e){ toast(e.message); }
-}
-function ideaCard(i, open){
-  return `<article class="idea ${open?"open":""}"><p class="tchips"><span class="tchip lv">${esc(FIELDNAME[i.field]||i.field)}</span><span class="tchip">${esc(prettyDay(i.date))}</span></p>
-    <h2 class="ititle">${esc(i.title)}</h2><p class="ibody">${esc(i.body)}</p>
-    <p class="iapp"><span class="k">Use it</span>${esc(i.applies)}</p>
-    ${(i.sources||[]).length?`<p class="hint">${i.sources.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>`).join("<br>")}</p>`:""}</article>`;
-}
-function learnView(){
-  return v2Page("learn", async ()=>{
-    const [ideasFile, reviews] = await Promise.all([ghJSON("learn/ideas.json").catch(()=>null), ghJSON("app/reviews.json").catch(()=>null)]);
-    const ideas = (ideasFile && ideasFile.ideas) || [], R = state.v2.reviews = (reviews && reviews.ideas) || {}, day = isoDay();
-    if(!ideas.length) return `<h1 class="ctitle">Learn</h1><div class="empty"><p class="hint" style="margin:0">Ideas arrive with the weekly run.</p></div>`;
-    const past = ideas.filter(i=>i.date<=day);
-    const todayIdea = past[past.length-1] || ideas[0];
-    let html = `<h1 class="ctitle">Today's idea</h1>` + ideaCard(todayIdea, true);
-    html += R[todayIdea.id] ? `<p class="hint">You have recalled this one. ${R[todayIdea.id].due?`Next review ${esc(prettyDay(R[todayIdea.id].due))}.`:"Learned."}</p>`
-      : `<h2 class="h2">Recall</h2><p class="hint sub0">Answer in your head, then check.</p>` + quizHTML(todayIdea, "new");
-    const due = ideas.filter(i=>i.id!==todayIdea.id && R[i.id] && R[i.id].due && R[i.id].due<=day);
-    if(due.length) html += `<h2 class="h2">Due for review</h2>` + due.map(i=>`<div class="tk"><button class="tkmain" onclick="this.parentNode.classList.toggle('open')"><span class="tkbody"><span class="tktext">${esc(i.title)}</span><span class="tkwhy">${esc(FIELDNAME[i.field]||"")}, stage ${R[i.id].stage+1} of 4</span></span></button><div class="tkmore">${quizHTML(i,"review")}</div></div>`).join("");
-    const earlier = past.filter(i=>i.id!==todayIdea.id).reverse();
-    if(earlier.length) html += `<h2 class="h2">Earlier ideas</h2><div class="tks">${earlier.map(i=>`<div class="tk"><button class="tkmain" onclick="this.parentNode.classList.toggle('open')"><span class="tkbody"><span class="tktext">${esc(i.title)}</span><span class="tkwhy">${esc(FIELDNAME[i.field]||"")}${R[i.id]?(R[i.id].due?`, review ${esc(prettyDay(R[i.id].due))}`:", learned"):", not recalled yet"}</span></span></button><div class="tkmore">${ideaCard(i)}${R[i.id]?"":quizHTML(i,"new")}</div></div>`).join("")}</div>`;
-    const ahead = ideas.filter(i=>i.date>day).length;
-    if(ahead) html += `<p class="hint">${ahead} more idea${ahead>1?"s":""} this week, one a day.</p>`;
-    return html;
-  });
-}
-
-
-// Small Markdown reader for the history files: headings, paragraphs, lists, tables, bold, italic, links.
-function md(src){
-  const inline = t => esc(t).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>').replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\*(.+?)\*/g,"<i>$1</i>");
-  const cells = l => l.trim().replace(/^\||\|$/g,"").split("|").map(c=>c.trim());
-  const L = String(src).replace(/\r/g,"").split("\n"); let out="", i=0;
-  const special = l => /^(#{1,3}\s|- |\d+\.\s|\|)/.test(l);
-  while(i<L.length){
-    const l=L[i];
-    if(!l.trim()){ i++; continue; }
-    let m;
-    if((m=l.match(/^(#{1,3})\s+(.*)/))){ out+=`<h${m[1].length===1?2:m[1].length}>${inline(m[2])}</h${m[1].length===1?2:m[1].length}>`; i++; continue; }
-    if(l.startsWith("|")){
-      const rows=[]; while(i<L.length && L[i].startsWith("|")) rows.push(cells(L[i++]));
-      const head=rows[0], body=rows.slice(2);
-      out+=body.map(r=>`<div class="trow">${r.map((c,j)=>j===0?`<p>${inline(c)}</p>`:`<p><span class="k">${inline(head[j]||"")}</span>${inline(c)}</p>`).join("")}</div>`).join("");
-      continue;
+    for (const item of readList("curious.queue")){
+      const body = {text:item.text, asked_at:item.asked_at, how:item.how};
+      const res = await gh(`contents/${item.path}`, {method:"PUT", body: JSON.stringify({
+        message: "Question: " + item.text.slice(0,60), content: b64(JSON.stringify(body,null,2)+"\n")})});
+      writeList("curious.queue", readList("curious.queue").filter(q=>q.id!==item.id));
+      const rec = readList("curious.recent").map(q => q.id===item.id ? {...q, sha:res.content.sha, synced:true} : q);
+      writeList("curious.recent", rec);
+      bumpCount(1);
     }
-    if(l.startsWith("- ")){ let li=""; while(i<L.length && L[i].startsWith("- ")) li+=`<li>${inline(L[i++].slice(2))}</li>`; out+=`<ul>${li}</ul>`; continue; }
-    if((m=l.match(/^(\d+)\.\s+(.*)/))){ out+=`<ol start="${m[1]}"><li>${inline(m[2])}</li></ol>`; i++; continue; }
-    let para=[]; while(i<L.length && L[i].trim() && !special(L[i])) para.push(L[i++]);
-    out+=`<p>${inline(para.join(" "))}</p>`;
+  }catch(e){
+    if (e.message==="key") showSetup("The saved key was rejected. Paste a fresh one.");
+  }finally{ flushing = false; renderRecent(); }
+}
+function bumpCount(n){ const c = Number(store("curious.count")||0)+n; store("curious.count", String(Math.max(0,c))); renderCount(); }
+async function refreshCount(){
+  if (!token() || !navigator.onLine) return;
+  try{
+    const months = await gh(`contents/${FOLDER}`);
+    let total = 0;
+    for (const m of months.filter(x=>x.type==="dir")){
+      const files = await gh(`contents/${m.path}`);
+      total += files.filter(f=>f.name.endsWith(".json")).length;
+    }
+    store("curious.count", String(total)); renderCount();
+  }catch(e){ /* folder may not exist yet */ }
+}
+function renderCount(){
+  const c = Number(store("curious.count")||0) + readList("curious.queue").length;
+  $("count").textContent = c ? `${c} question${c===1?"":"s"} saved` : "";
+}
+
+function save(text, how){
+  text = text.trim().replace(/\s+/g," ");
+  if (!text) return;
+  text = text.charAt(0).toUpperCase() + text.slice(1);
+  if (!/[?.!]$/.test(text)) text += "?";
+  const d = new Date(), asked_at = isoLocal(d);
+  const stamp = asked_at.slice(0,19).replace(/:/g,"").replace("T","-");
+  const id = stamp + "-" + Math.random().toString(36).slice(2,6);
+  const item = {id, text, asked_at, how, path:`${FOLDER}/${asked_at.slice(0,7)}/${id}.json`};
+  writeList("curious.queue", [...readList("curious.queue"), item]);
+  writeList("curious.recent", [{...item, synced:false}, ...readList("curious.recent")].slice(0,12));
+  lastSaved = item;
+  renderCount(); renderRecent(); flush();
+  return item;
+}
+async function undo(item){
+  writeList("curious.queue", readList("curious.queue").filter(q=>q.id!==item.id));
+  const rec = readList("curious.recent").find(q=>q.id===item.id);
+  writeList("curious.recent", readList("curious.recent").filter(q=>q.id!==item.id));
+  if (rec && rec.synced && rec.sha){
+    try{ await gh(`contents/${item.path}`, {method:"DELETE", body: JSON.stringify({message:"Remove question", sha:rec.sha})}); bumpCount(-1); }
+    catch(e){ /* leave it; rare */ }
   }
-  return out;
+  renderCount(); renderRecent();
 }
 
-async function historyView(key){
-  app.innerHTML = header(backBtn) + `<p class="hint">Opening history</p>`;
-  let text;
-  try{ text = /^[a-z0-9_-]+$/.test(key) ? await gh(`contents/history/${key}.md`,{raw:true}) : null; }catch(e){ app.innerHTML += `<p class="err">${esc(e.message)}</p>`; return; }
-  if(!text){ app.innerHTML += `<p class="err">That history was not found.</p>`; return; }
-  app.innerHTML = header(backBtn) + `<article class="doc">
-    <p class="hint" style="margin:0">${esc(CATNAME[key]||key)}</p>
-    <p class="hint" style="margin:2px 0 0">Research history from your earlier ChatGPT project. Read it as history, not as checked findings.</p>
-    ${md(text)}</article>`;
-  window.scrollTo(0,0);
-}
+// ---------- screen ----------
+let phase = "idle", rec = null, heard = "", lastSaved = null, lastStart = 0;
+let said = "", seg = "", stopping = false, discard = false, capTimer = null, quickEnds = 0;
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const CAP_MS = 5 * 60 * 1000;   // safety: save after 5 minutes if stop is never pressed
+const STOP = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2.5" fill="currentColor"/></svg>`;
+const join = (a,b) => [a,b].map(x=>(x||"").trim()).filter(Boolean).join(" ");
 
-function go(h){ if(location.hash===h || (h==="#" && !location.hash)) route(); else location.hash=h; }
-function route(){
-  clearTimeout(state.poll);
-  const h = location.hash;
-  if(!token() || h==="#settings"){ settingsView(); return syncBar(""); }
-  if(h==="#add"){ addView(""); return syncBar("add"); }
-  if(h==="#world") return worldView();
-  if(h==="#learn") return learnView();
-  if(h==="#life") return lifeView();
-  if(h==="#profile") return profileView();
-  if(h==="#today/history") return todayHistoryView();
-  if(h==="#library") return libraryView();
-  if(h==="#cats") return catsView();
-  if(h==="#changes") return changesView();
-  if(h.startsWith("#cat/")){ const [k,tab] = decodeURIComponent(h.slice(5)).split("/"); return categoryView(k, tab); }
-  if(h.startsWith("#history/")){ historyView(decodeURIComponent(h.slice(9))); return syncBar(""); }
-  if(h.startsWith("#card/")) return cardView(decodeURIComponent(h.slice(6)));
-  return todayView();
-}
-window.addEventListener("hashchange", route);
-
-// Share target: Android passes the link in "url" or inside "text".
-(function start(){
-  const q = new URLSearchParams(location.search);
-  if(q.has("share") || q.has("url") || q.has("text")){
-    const link = q.get("url") || findUrl(q.get("text")) || findUrl(q.get("title"));
-    if(!token()) { store("weave.pendingshare", link); return settingsView("Connect your vault first. Your shared link is kept."); }
-    addView(link); return syncBar("add");
+function view(){
+  const m = $("main");
+  if (phase==="setup") return;
+  if (phase==="typing"){
+    m.innerHTML = `<div class="typed"><label class="status" for="tq">Type your question</label>
+      <textarea id="tq" rows="3" placeholder="Why do we dream?"></textarea>
+      <div class="row"><button class="b primary" id="tsave">Save</button><button class="b" id="tcancel">Back to voice</button></div></div>`;
+    $("tq").focus();
+    $("tsave").onclick = () => { const v=$("tq").value; if(!v.trim()) return; save(v,"typed"); phase="saved"; view(); };
+    $("tcancel").onclick = () => { phase="idle"; view(); listen(); };
+    return;
   }
-  const pend = store("weave.pendingshare");
-  if(pend && token()){ store("weave.pendingshare", null); addView(pend); return syncBar("add"); }
-  route();
-})();
+  const cls = {listening:"on", saved:"done", idle:"idle", blocked:"idle", nomic:"idle"}[phase] || "idle";
+  const status = {
+    listening: "Listening. Press stop when you're done",
+    saved: navigator.onLine && token() ? "Saved" : "Saved on phone. Sends when online",
+    idle: heard===null ? "Didn't catch that. Tap to try again" : "Tap to ask",
+    blocked: "Microphone is off for this app",
+    nomic: "Voice isn't available here"
+  }[phase];
+  const live = join(said, seg);
+  const showText = phase==="saved" ? lastSaved.text : (phase==="listening" ? live : "");
+  const icon = phase==="saved" ? TICK : phase==="listening" ? STOP : MIC;
+  m.innerHTML = `
+    <button class="lamp ${cls}" id="lamp" aria-label="${phase==="listening"?"Stop and save":"Ask a question"}">${icon}</button>
+    <div class="status ${phase==="saved"?"ok":(phase==="blocked"||phase==="nomic")?"warn":""}" role="status">${esc(status)}</div>
+    <p class="q ${showText?"":"ghost"}" id="qtext">${esc(showText || (phase==="listening" ? "…" : ""))}</p>
+    <div class="when">${phase==="saved" ? esc(niceTime(lastSaved.asked_at)) : ""}</div>
+    <div class="row">
+      ${phase==="listening" ? `<button class="b primary" id="stopbtn">Stop and save</button><button class="b" id="discard">Discard</button>` : ""}
+      ${phase==="saved" ? `<button class="b primary" id="again">Ask another</button><button class="b" id="undo">Undo</button>` : ""}
+    </div>
+    ${phase==="blocked" ? `<p class="when" style="max-width:34ch">Allow the microphone for this app in your phone's site settings, then reopen it.</p>` : ""}
+    ${phase==="listening" ? "" : `<button class="link" id="type">Type instead</button>`}`;
+  $("lamp").onclick = () => phase==="listening" ? finish() : listen();
+  if (phase==="listening"){
+    $("stopbtn").onclick = () => finish();
+    $("discard").onclick = () => cancel();
+  } else {
+    $("type").onclick = () => { phase="typing"; view(); };
+  }
+  if (phase==="saved"){
+    $("again").onclick = () => listen();
+    $("undo").onclick = async () => { const it=lastSaved; lastSaved=null; heard=""; phase="idle"; view(); await undo(it); };
+  }
+}
+function showLive(){
+  const q = $("qtext"); if (!q) return;
+  const t = join(said, seg); q.textContent = t || "…"; q.classList.toggle("ghost", !t);
+}
 
-if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+// The phone's speech engine stops on every pause. We restart it straight away
+// and keep adding to the text, so only your Stop press ends the question.
+function listen(){
+  if (!SR){ phase="nomic"; view(); return; }
+  if (phase==="listening") return;
+  said = ""; seg = ""; heard = ""; stopping = false; discard = false; quickEnds = 0;
+  phase = "listening"; lastStart = Date.now(); view();
+  clearTimeout(capTimer); capTimer = setTimeout(finish, CAP_MS);
+  segment();
+}
+function segment(){
+  const r = new SR(); rec = r;
+  r.lang = LANG; r.interimResults = true; r.continuous = false; r.maxAlternatives = 1;
+  let segFinal = "", began = Date.now(), fatal = false;
+  r.onresult = e => {
+    let all = ""; segFinal = "";
+    for (const x of e.results){ all += x[0].transcript; if (x.isFinal) segFinal += x[0].transcript; }
+    seg = all; showLive();
+  };
+  r.onerror = e => {
+    if (e.error==="not-allowed" || e.error==="service-not-allowed" || e.error==="audio-capture"){
+      fatal = true; clearTimeout(capTimer); phase = "blocked"; rec = null; view();
+    }
+  };
+  r.onend = () => {
+    if (rec !== r) return;
+    if (!discard) said = join(said, segFinal || seg);
+    seg = ""; rec = null;
+    if (fatal) return;
+    if (phase==="listening" && !stopping && !discard){
+      // guard against a broken engine restarting in a tight loop
+      quickEnds = (Date.now()-began < 800) ? quickEnds+1 : 0;
+      if (quickEnds > 8){ finalize(); return; }
+      try{ segment(); }catch(e){ finalize(); }
+      return;
+    }
+    finalize();
+  };
+  r.start();
+}
+function finish(){
+  if (phase!=="listening") return;
+  stopping = true; clearTimeout(capTimer);
+  if (rec){ try{ rec.stop(); }catch(e){ finalize(); } }   // onend adds the last words, then saves
+  else finalize();
+}
+function cancel(){
+  discard = true; stopping = true; clearTimeout(capTimer);
+  if (rec){ try{ rec.abort(); }catch(e){} }
+  rec = null; said = ""; seg = ""; heard = ""; phase = "idle"; view();
+}
+function finalize(){
+  clearTimeout(capTimer);
+  if (discard){ discard = false; stopping = false; return; }
+  stopping = false; rec = null;
+  const text = said.trim(); said = ""; seg = "";
+  if (text){ save(text,"voice"); phase="saved"; heard=""; }
+  else { heard = null; phase="idle"; }
+  view();
+}
+
+function renderRecent(){
+  const items = readList("curious.recent").slice(0,5);
+  $("recent").hidden = !items.length;
+  $("list").innerHTML = items.map(q => `<li><span class="txt">${esc(q.text)}</span><span class="t2 ${q.synced?"":"pend"}">${q.synced?esc(niceTime(q.asked_at)):"Waiting to send"}</span></li>`).join("");
+}
+
+function showSetup(msg){
+  phase = "setup";
+  $("main").innerHTML = `<div class="setup">
+    <p><strong>Connect once.</strong> ${esc(msg || "Questions are saved to your private weave-vault on GitHub. Paste the same access key you used for Weave.")}</p>
+    <label for="key" class="count">Access key</label>
+    <input class="t" id="key" type="password" autocomplete="off" placeholder="github_pat_...">
+    <div class="row" style="justify-content:flex-start"><button class="b primary" id="ksave">Save and check</button><button class="b" id="kskip">Skip for now</button></div>
+    <p id="kerr" style="color:var(--warn)"></p></div>`;
+  $("ksave").onclick = async () => {
+    const t = $("key").value.replace(/[^\x21-\x7E]/g,"");
+    if (!t){ $("kerr").textContent = "Paste the key first."; return; }
+    store("weave.token", t);
+    try{ await gh(""); phase="idle"; view(); flush(); refreshCount(); listen(); }
+    catch(e){ $("kerr").textContent = e.message==="key" ? "GitHub rejected that key." : "Could not reach the vault. Check the key can write to weave-vault."; }
+  };
+  $("kskip").onclick = () => { phase="idle"; view(); listen(); };
+}
+
+// Start listening whenever the app comes to the front.
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState==="visible"){
+    flush();
+    if ((phase==="idle" || phase==="saved") && Date.now()-lastStart > 1500) listen();
+  } else if (phase==="listening"){ finish(); }   // leaving the app saves what was said
+});
+addEventListener("online", () => { flush(); view(); });
+addEventListener("offline", () => view());
+
+renderRecent(); renderCount();
+if (!token()) showSetup();
+else { view(); listen(); flush(); refreshCount(); }
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js", {scope:"./"}).catch(()=>{});
 </script>
 </body>
 </html>
