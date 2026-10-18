@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Curious Much?</title>
+<meta name="theme-color" content="#1B2340">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500&display=swap">
+<style>
+/* One screen: a listening lamp in the middle, the question under it, recent questions at the foot. */
+:root{
+  --bg:#EEF0F6; --surface:#FFFFFF; --ink:#1B2340; --muted:#5E6684; --line:#D6DAE6;
+  --lamp:#E07A2E; --lamp-soft:rgba(224,122,46,.16); --ok:#2E7D5B; --warn:#B0412E;
+  --ui:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --read:"Newsreader",Georgia,"Times New Roman",serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#141A30; --surface:#1D2440; --ink:#ECEEF6; --muted:#A3AAC4; --line:#2E3657;
+  --lamp:#F0954A; --lamp-soft:rgba(240,149,74,.18); --ok:#5FC497; --warn:#F08A76;
+  color-scheme:dark;
+}}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--ui);
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  -webkit-tap-highlight-color:transparent}
+.wrap{min-height:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:20px;
+  padding-block:18px 24px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-weight:600;letter-spacing:.01em}
+.count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;text-align:center;min-height:52vh}
+.lamp{width:148px;height:148px;border-radius:50%;border:0;background:var(--lamp);color:#fff;cursor:pointer;
+  display:grid;place-items:center;position:relative;box-shadow:0 0 0 0 var(--lamp-soft)}
+.lamp svg{width:46px;height:46px}
+.lamp:focus-visible{outline:3px solid var(--ink);outline-offset:6px}
+.lamp.idle{background:var(--surface);color:var(--lamp);border:2px solid var(--line)}
+.lamp.on{animation:breathe 1.6s ease-in-out infinite}
+.lamp.done{background:var(--ok)}
+@keyframes breathe{0%,100%{box-shadow:0 0 0 0 var(--lamp-soft)}50%{box-shadow:0 0 0 26px var(--lamp-soft)}}
+@media (prefers-reduced-motion:reduce){.lamp.on{animation:none;box-shadow:0 0 0 14px var(--lamp-soft)}}
+.status{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-height:20px}
+.status.ok{color:var(--ok)} .status.warn{color:var(--warn)}
+.q{font:italic 500 clamp(22px,6vw,30px)/1.3 var(--read);max-width:28ch;text-wrap:balance;min-height:1.3em;margin:0;overflow-wrap:anywhere}
+.q.ghost{color:var(--muted);font-weight:400}
+.when{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;min-height:21px}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+button.b{font:600 15px var(--ui);padding:11px 18px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.b.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button.b:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--lamp);outline-offset:2px}
+.link{background:none;border:0;color:var(--muted);font:500 14px var(--ui);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px}
+textarea,input.t{width:100%;font:italic 20px/1.4 var(--read);color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px;resize:vertical}
+input.t{font:15px var(--ui)}
+.typed{width:100%;display:flex;flex-direction:column;gap:12px}
+.recent h2{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.recent ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.recent li{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-top:1px solid var(--line)}
+.recent .txt{font:italic 17px/1.35 var(--read);min-width:0;overflow-wrap:anywhere}
+.recent .t2{font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;padding-top:3px}
+.recent .pend{color:var(--lamp)}
+.setup{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;text-align:left}
+.setup p{margin:0;color:var(--muted);font-size:14px}
+.setup strong{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><span class="brand">Curious Much?</span><span class="count" id="count"></span></header>
+  <main id="main"></main>
+  <section class="recent" id="recent" hidden><h2>Recent</h2><ol id="list"></ol></section>
+</div>
+<script>
+"use strict";
+const DEFAULT_REPO = "rjcrooze-cmyk/weave-vault";
+const FOLDER = "questions";
+const LANG = "en-IN";
+
+function store(k,v){try{ if(v===undefined) return localStorage.getItem(k); if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v);}catch(e){return null}}
+const token = () => store("weave.token");          // shared with Weave on this phone
+const repo  = () => store("weave.repo") || DEFAULT_REPO;
+const readList = k => { try{ return JSON.parse(store(k)||"[]"); }catch(e){ return []; } };
+const writeList = (k,a) => store(k, JSON.stringify(a));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const $ = id => document.getElementById(id);
+
+const MIC = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>`;
+const TICK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+
+// ---------- time ----------
+function isoLocal(d){
+  const p = n => String(Math.abs(n)).padStart(2,"0");
+  const off = -d.getTimezoneOffset();
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}${off>=0?"+":"-"}${p(Math.trunc(off/60))}:${p(off%60)}`;
+}
+function niceTime(iso){
+  const d = new Date(iso), now = new Date();
+  const time = d.toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"});
+  if (d.toDateString()===now.toDateString()) return `Today, ${time}`;
+  const y = new Date(now); y.setDate(now.getDate()-1);
+  if (d.toDateString()===y.toDateString()) return `Yesterday, ${time}`;
+  return d.toLocaleDateString("en-IN",{day:"numeric",month:"short",year: d.getFullYear()===now.getFullYear()?undefined:"numeric"}) + `, ${time}`;
+}
+
+// ---------- GitHub ----------
+function b64(str){ const bytes=new TextEncoder().encode(str); let bin=""; bytes.forEach(b=>bin+=String.fromCharCode(b)); return btoa(bin); }
+async function gh(path, opts={}){
+  const res = await fetch(`https://api.github.com/repos/${repo()}${path ? "/" + path : ""}`, {
+    cache:"no-store", ...opts,
+    headers:{"Authorization":`Bearer ${token()}`,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}
+  });
+  if(res.status===401) throw new Error("key");
+  if(!res.ok) throw new Error(String(res.status));
+  return res.json();
+}
+
+// queue: questions not yet in the vault. recent: the last few, for this screen only.
+let flushing = false;
+async function flush(){
+  if (flushing || !token() || !navigator.onLine) return;
+  flushing = true;
+  try{
+    for (const item of readList("curious.queue")){
+      const body = {text:item.text, asked_at:item.asked_at, how:item.how};
+      const res = await gh(`contents/${item.path}`, {method:"PUT", body: JSON.stringify({
+        message: "Question: " + item.text.slice(0,60), content: b64(JSON.stringify(body,null,2)+"\n")})});
+      writeList("curious.queue", readList("curious.queue").filter(q=>q.id!==item.id));
+      const rec = readList("curious.recent").map(q => q.id===item.id ? {...q, sha:res.content.sha, synced:true} : q);
+      writeList("curious.recent", rec);
+      bumpCount(1);
+    }
+  }catch(e){
+    if (e.message==="key") showSetup("The saved key was rejected. Paste a fresh one.");
+  }finally{ flushing = false; renderRecent(); }
+}
+function bumpCount(n){ const c = Number(store("curious.count")||0)+n; store("curious.count", String(Math.max(0,c))); renderCount(); }
+async function refreshCount(){
+  if (!token() || !navigator.onLine) return;
+  try{
+    const months = await gh(`contents/${FOLDER}`);
+    let total = 0;
+    for (const m of months.filter(x=>x.type==="dir")){
+      const files = await gh(`contents/${m.path}`);
+      total += files.filter(f=>f.name.endsWith(".json")).length;
+    }
+    store("curious.count", String(total)); renderCount();
+  }catch(e){ /* folder may not exist yet */ }
+}
+function renderCount(){
+  const c = Number(store("curious.count")||0) + readList("curious.queue").length;
+  $("count").textContent = c ? `${c} question${c===1?"":"s"} saved` : "";
+}
+
+function save(text, how){
+  text = text.trim().replace(/\s+/g," ");
+  if (!text) return;
+  text = text.charAt(0).toUpperCase() + text.slice(1);
+  if (!/[?.!]$/.test(text)) text += "?";
+  const d = new Date(), asked_at = isoLocal(d);
+  const stamp = asked_at.slice(0,19).replace(/:/g,"").replace("T","-");
+  const id = stamp + "-" + Math.random().toString(36).slice(2,6);
+  const item = {id, text, asked_at, how, path:`${FOLDER}/${asked_at.slice(0,7)}/${id}.json`};
+  writeList("curious.queue", [...readList("curious.queue"), item]);
+  writeList("curious.recent", [{...item, synced:false}, ...readList("curious.recent")].slice(0,12));
+  lastSaved = item;
+  renderCount(); renderRecent(); flush();
+  return item;
+}
+async function undo(item){
+  writeList("curious.queue", readList("curious.queue").filter(q=>q.id!==item.id));
+  const rec = readList("curious.recent").find(q=>q.id===item.id);
+  writeList("curious.recent", readList("curious.recent").filter(q=>q.id!==item.id));
+  if (rec && rec.synced && rec.sha){
+    try{ await gh(`contents/${item.path}`, {method:"DELETE", body: JSON.stringify({message:"Remove question", sha:rec.sha})}); bumpCount(-1); }
+    catch(e){ /* leave it; rare */ }
+  }
+  renderCount(); renderRecent();
+}
+
+// ---------- screen ----------
+let phase = "idle", rec = null, heard = "", lastSaved = null, lastStart = 0;
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+function view(){
+  const m = $("main");
+  if (phase==="setup") return;
+  if (phase==="typing"){
+    m.innerHTML = `<div class="typed"><label class="status" for="tq">Type your question</label>
+      <textarea id="tq" rows="3" placeholder="Why do we dream?"></textarea>
+      <div class="row"><button class="b primary" id="tsave">Save</button><button class="b" id="tcancel">Back to voice</button></div></div>`;
+    $("tq").focus();
+    $("tsave").onclick = () => { const v=$("tq").value; if(!v.trim()) return; save(v,"typed"); phase="saved"; view(); };
+    $("tcancel").onclick = () => { phase="idle"; view(); listen(); };
+    return;
+  }
+  const cls = {listening:"on", saved:"done", idle:"idle", blocked:"idle", nomic:"idle"}[phase] || "idle";
+  const status = {
+    listening: heard ? "Listening" : "Listening. Ask away",
+    saved: navigator.onLine && token() ? "Saved" : "Saved on phone. Sends when online",
+    idle: heard===null ? "Didn't catch that. Tap to try again" : "Tap to ask",
+    blocked: "Microphone is off for this app",
+    nomic: "Voice isn't available here"
+  }[phase];
+  const showText = phase==="saved" ? lastSaved.text : (heard || "");
+  m.innerHTML = `
+    <button class="lamp ${cls}" id="lamp" aria-label="${phase==="listening"?"Stop listening":"Ask a question"}">${phase==="saved"?TICK:MIC}</button>
+    <div class="status ${phase==="saved"?"ok":(phase==="blocked"||phase==="nomic")?"warn":""}" role="status">${esc(status)}</div>
+    <p class="q ${showText?"":"ghost"}" id="qtext">${esc(showText || (phase==="listening" ? "…" : ""))}</p>
+    <div class="when">${phase==="saved" ? esc(niceTime(lastSaved.asked_at)) : ""}</div>
+    <div class="row">
+      ${phase==="saved" ? `<button class="b primary" id="again">Ask another</button><button class="b" id="undo">Undo</button>` : ""}
+    </div>
+    ${phase==="blocked" ? `<p class="when" style="max-width:34ch">Allow the microphone for this app in your phone's site settings, then reopen it.</p>` : ""}
+    <button class="link" id="type">Type instead</button>`;
+  $("lamp").onclick = () => phase==="listening" ? stop() : listen(true);
+  $("type").onclick = () => { stop(true); phase="typing"; view(); };
+  if (phase==="saved"){
+    $("again").onclick = () => listen(true);
+    $("undo").onclick = async () => { const it=lastSaved; lastSaved=null; heard=""; phase="idle"; view(); await undo(it); };
+  }
+}
+
+function listen(){
+  if (!SR){ phase="nomic"; view(); return; }
+  if (phase==="listening") return;
+  heard = ""; phase = "listening"; lastStart = Date.now(); view();
+  rec = new SR();
+  rec.lang = LANG; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+  let finalText = "";
+  rec.onresult = e => {
+    let all = ""; finalText = "";
+    for (const r of e.results){ all += r[0].transcript; if (r.isFinal) finalText += r[0].transcript; }
+    heard = all; const q=$("qtext"); if(q){ q.textContent = all; q.classList.remove("ghost"); }
+  };
+  rec.onerror = e => {
+    if (e.error==="not-allowed" || e.error==="service-not-allowed"){ phase="blocked"; rec=null; view(); }
+  };
+  rec.onend = () => {
+    if (phase!=="listening"){ rec=null; return; }
+    rec = null;
+    const text = (finalText || heard || "").trim();
+    if (text){ save(text,"voice"); phase="saved"; }
+    else { heard = null; phase="idle"; }
+    view();
+  };
+  try{ rec.start(); }catch(e){ phase="idle"; heard=""; view(); }
+}
+function stop(silent){
+  if (!rec) return;
+  if (silent){ phase="idle"; try{ rec.abort(); }catch(e){} rec=null; return; }
+  try{ rec.stop(); }catch(e){}   // onend saves whatever was heard
+}
+
+function renderRecent(){
+  const items = readList("curious.recent").slice(0,5);
+  $("recent").hidden = !items.length;
+  $("list").innerHTML = items.map(q => `<li><span class="txt">${esc(q.text)}</span><span class="t2 ${q.synced?"":"pend"}">${q.synced?esc(niceTime(q.asked_at)):"Waiting to send"}</span></li>`).join("");
+}
+
+function showSetup(msg){
+  phase = "setup";
+  $("main").innerHTML = `<div class="setup">
+    <p><strong>Connect once.</strong> ${esc(msg || "Questions are saved to your Weave vault. If Weave is set up on this phone, open it once and come back. Otherwise paste the same access key here.")}</p>
+    <label for="key" class="count">Access key</label>
+    <input class="t" id="key" type="password" autocomplete="off" placeholder="github_pat_...">
+    <div class="row" style="justify-content:flex-start"><button class="b primary" id="ksave">Save and check</button><button class="b" id="kskip">Skip for now</button></div>
+    <p id="kerr" style="color:var(--warn)"></p></div>`;
+  $("ksave").onclick = async () => {
+    const t = $("key").value.replace(/[^\x21-\x7E]/g,"");
+    if (!t){ $("kerr").textContent = "Paste the key first."; return; }
+    store("weave.token", t);
+    try{ await gh(""); phase="idle"; view(); flush(); refreshCount(); listen(); }
+    catch(e){ $("kerr").textContent = e.message==="key" ? "GitHub rejected that key." : "Could not reach the vault. Check the key can write to weave-vault."; }
+  };
+  $("kskip").onclick = () => { phase="idle"; view(); listen(); };
+}
+
+// Start listening whenever the app comes to the front.
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState==="visible"){
+    flush();
+    if ((phase==="idle" || phase==="saved") && Date.now()-lastStart > 1500) listen();
+  } else if (phase==="listening"){ stop(true); view(); }
+});
+addEventListener("online", () => { flush(); view(); });
+addEventListener("offline", () => view());
+
+renderRecent(); renderCount();
+if (!token()) showSetup();
+else { view(); listen(); flush(); refreshCount(); }
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js", {scope:"./"}).catch(()=>{});
+</script>
+</body>
+</html>
